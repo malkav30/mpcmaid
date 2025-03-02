@@ -5,8 +5,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * An sample player which employs limited number of threads to play clips. Each
- * thread creates it's own dataLine.
+ * A sample player which employs limited number of threads to play clips. Each
+ * thread creates its own dataLine.
  *
  * @pattern Singleton We only need one sample player for every window, so that
  *          to control the overall polyphony.
@@ -16,7 +16,7 @@ public final class SamplePlayer {
 
 	private final static SamplePlayer INSTANCE = new SamplePlayer();
 
-	private final static BlockingQueue<Sample> queue = new ArrayBlockingQueue<Sample>(1);
+	private final static BlockingQueue<Sample> queue = new ArrayBlockingQueue<>(1);
 
 	static {
 		// only six sounds can be heard at once

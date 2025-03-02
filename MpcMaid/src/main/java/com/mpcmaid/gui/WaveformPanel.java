@@ -239,7 +239,7 @@ public class WaveformPanel extends JPanel {
 		return markers.getDuration();
 	}
 
-	public static final String shortName(String name) {
+	public static String shortName(String name) {
 		final int indexOf = name.lastIndexOf('.');
 		if (indexOf != -1) {
 			return name.substring(0, indexOf);
@@ -247,7 +247,7 @@ public class WaveformPanel extends JPanel {
 		return name;
 	}
 
-	public static final String prefixProposal(String name, final int maxLen) {
+	public static String prefixProposal(String name, final int maxLen) {
 		final int indexOf = name.indexOf('.');
 		String prefix = name;
 		if (indexOf != -1) {

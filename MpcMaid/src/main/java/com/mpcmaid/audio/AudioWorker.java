@@ -31,7 +31,7 @@ public class AudioWorker extends Thread {
 			try {
 				Sample sample;
 				try {
-					sample = (Sample) clipQueue.poll(5, TimeUnit.SECONDS);
+					sample = clipQueue.poll(5, TimeUnit.SECONDS);
 					if (sample == null) {
 						if (dataLine != null && dataLine.isOpen() && !dataLine.isRunning()) {
 							dataLine.close();
@@ -66,12 +66,8 @@ public class AudioWorker extends Thread {
 
 				dataLine.write(sample.getBytes(), 0, sample.getBytes().length);
 				//dataLine.close();
-			} catch (LineUnavailableException e) {
+			} catch (LineUnavailableException | IllegalArgumentException e) {
 				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (Throwable t) {
-				t.printStackTrace();
 			}
 		}
 	}

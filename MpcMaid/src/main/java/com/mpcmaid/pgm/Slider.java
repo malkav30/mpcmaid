@@ -37,7 +37,7 @@ public final class Slider extends BaseElement {
 	// Tune range 0-100
 	public static final Parameter DECAY_RANGE = Parameter.range("Decay", 0x29E4, 0, 100);
 
-	protected Slider(final Program parent, int sliderIndex) {
+	Slider(final Program parent, int sliderIndex) {
 		super(parent, 0, sliderIndex, SLIDER_LENGTH);
 		Program.assertIn(0, sliderIndex, 1, "slider");
 	}

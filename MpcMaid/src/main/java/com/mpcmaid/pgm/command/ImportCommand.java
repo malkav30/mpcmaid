@@ -1,7 +1,6 @@
 package com.mpcmaid.pgm.command;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import com.mpcmaid.pgm.Sample;
@@ -10,7 +9,7 @@ import com.mpcmaid.pgm.Sample.Status;
 
 /**
  * Imports files and processes them into Sample objects for later use.
- * 
+ * <p>
  * Subclasses must call importFiles() to process the imported files before use.
  * 
  * @author cyrille martraire
@@ -61,21 +60,19 @@ public abstract class ImportCommand implements SampleCommand {
 	 * an extension other than .wav, renaming file names too long)
 	 */
 	protected void importFiles() {
-		Iterator<File> it = files.iterator();
-		while (it.hasNext()) {
-			final File file = (File) it.next();
-			importCount++;
-			final Sample sample = Sample.importFile(file, 16, errorPolicy, true, renameCount);
-			if (sample == null || sample.isRejected()) {
-				rejectedCount++;
-			} else {
-				// increments the rename count if needed
-				if (sample.isRenamed()) {
-					renameCount++;
-				}
-				addSample(sample);
-			}
-		}
+        for (File file : files) {
+            importCount++;
+            final Sample sample = Sample.importFile(file, 16, errorPolicy, true, renameCount);
+            if (sample == null || sample.isRejected()) {
+                rejectedCount++;
+            } else {
+                // increments the rename count if needed
+                if (sample.isRenamed()) {
+                    renameCount++;
+                }
+                addSample(sample);
+            }
+        }
 	}
 
 	/**

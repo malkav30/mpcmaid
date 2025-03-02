@@ -24,7 +24,7 @@ public final class PadFilter1 extends BaseElement {
 	public final static Parameter[] PARAMETERS = { FILTER1_TYPE, FILTER1_FREQ, FILTER1_RES, FILTER1_VELOCITY_TO_FREQ,
 			FILTER_ATTN };
 
-	protected PadFilter1(final Pad parent) {
+	PadFilter1(final Pad parent) {
 		super(parent);
 	}
 

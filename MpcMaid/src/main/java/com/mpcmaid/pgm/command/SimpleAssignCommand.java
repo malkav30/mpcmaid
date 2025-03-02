@@ -58,7 +58,7 @@ public class SimpleAssignCommand extends ImportCommand {
 					if (!it.hasNext()) {
 						return impactedPads;
 					}
-					final Sample sample = (Sample) it.next();
+					final Sample sample = it.next();
 					matrix.set(layer, sample);
 
 					layer.setSampleName(sample.getSampleName());

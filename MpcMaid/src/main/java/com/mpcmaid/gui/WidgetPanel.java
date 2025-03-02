@@ -41,10 +41,9 @@ public class WidgetPanel extends JPanel implements BindingCapable {
 
 	protected void makeParameters() {
 		final Parameter[] parameters = element.getParameters();
-		for (int j = 0; j < parameters.length; j++) {
-			final Parameter parameter = parameters[j];
-			makeParameter(parameter);
-		}
+        for (final Parameter parameter : parameters) {
+            makeParameter(parameter);
+        }
 	}
 
 	protected void makeParameter(final Parameter parameter) {
@@ -118,13 +117,13 @@ public class WidgetPanel extends JPanel implements BindingCapable {
 
 	public void save() {
 		final Component[] widgets = getComponents();
-		for (int i = 0; i < widgets.length; i++) {
-			WidgetPanel component = (WidgetPanel) widgets[i];
-			component.save();
-		}
+        for (Component widget : widgets) {
+            WidgetPanel component = (WidgetPanel) widget;
+            component.save();
+        }
 	}
 
-	public final static String[] enumerate(Parameter parameter, String prefix) {
+	public static String[] enumerate(Parameter parameter, String prefix) {
 		final OffIntType type = (OffIntType) parameter.getType();
 		final Range range = type.getRange();
 		final String[] values = new String[range.getHigh() - range.getLow() + 1];

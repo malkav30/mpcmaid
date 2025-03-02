@@ -122,12 +122,11 @@ public abstract class BaseElement implements Element {
 	 */
 	public void copyFrom(BaseElement source, Set<Parameter> ignoreParams) {
 		final Parameter[] ps = getParameters();
-		for (int i = 0; i < ps.length; i++) {
-			final Parameter parameter = ps[i];
-			if (ignoreParams == null || !ignoreParams.contains(parameter)) {
-				final Object value = source.get(parameter);
-				set(parameter, value);
-			}
-		}
+        for (final Parameter parameter : ps) {
+            if (ignoreParams == null || !ignoreParams.contains(parameter)) {
+                final Object value = source.get(parameter);
+                set(parameter, value);
+            }
+        }
 	}
 }

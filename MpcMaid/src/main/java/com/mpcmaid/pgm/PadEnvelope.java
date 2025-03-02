@@ -18,7 +18,7 @@ public final class PadEnvelope extends BaseElement {
 
 	public final static Parameter[] PARAMETERS = { ATTACK, DECAY, DECAY_MODE, VELOCITY_TO_LEVEL };
 
-	protected PadEnvelope(final Pad parent) {
+	PadEnvelope(final Pad parent) {
 		super(parent);
 	}
 

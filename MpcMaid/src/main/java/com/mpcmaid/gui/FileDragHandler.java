@@ -34,10 +34,9 @@ public class FileDragHandler extends TransferHandler {
 	}
 
 	protected void process(List<File> files) {
-		for (int i = 0; i < files.size(); i++) {
-			File file = files.get(i);
-			process(file);
-		}
+        for (File file : files) {
+            process(file);
+        }
 	}
 
 	protected void process(File file) {
@@ -46,11 +45,11 @@ public class FileDragHandler extends TransferHandler {
 
 	public boolean canImport(JComponent c, DataFlavor[] flavors) {
 		final DataFlavor fileFlavor = DataFlavor.javaFileListFlavor;
-		for (int i = 0; i < flavors.length; i++) {
-			if (fileFlavor.equals(flavors[i])) {
-				return true;
-			}
-		}
+        for (DataFlavor flavor : flavors) {
+            if (fileFlavor.equals(flavor)) {
+                return true;
+            }
+        }
 		return false;
 	}
 }

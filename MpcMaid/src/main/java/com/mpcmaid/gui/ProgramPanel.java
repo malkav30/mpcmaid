@@ -18,7 +18,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -69,9 +68,7 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 
 	protected final Profile profile;
 
-	private final File pgmFile;
-
-	private final Program pgm;
+    private final Program pgm;
 
 	private final JButton[] padButtons = new JButton[64];
 
@@ -86,9 +83,8 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 	public ProgramPanel(Program program, Profile profile, File pgmFile) {
 		this.pgm = program;
 		this.profile = profile;
-		this.pgmFile = pgmFile;
 
-		this.samples = new ProgramSamples();
+        this.samples = new ProgramSamples();
 		this.samples.set(program, pgmFile == null ? null : pgmFile.getParentFile());
 		make();
 	}
@@ -233,7 +229,7 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 				}
 			}
 			final char ch = (char) ('A' + k);
-			banks.addTab("     " + String.valueOf(ch) + "     ", pads);
+			banks.addTab("     " + ch + "     ", pads);
 		}
 		final JButton lastSelected = padButtons[0];
 		lastSelected.setSelected(true);
@@ -262,10 +258,9 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 			return;
 		}
 
-		final String[] choices = ASSIGN_CHOICES2;
-		int response = JOptionPane.showOptionDialog(this,
+        int response = JOptionPane.showOptionDialog(this,
 				"Each dropped file will be assigned to a pad or sample layer. ", "Assign samples to locations",
-				JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, choices, "Pad");
+				JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, ASSIGN_CHOICES2, "Pad");
 		switch (response) {
 		case 0: {
 			return;
@@ -308,7 +303,7 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 
 	private void doAssignSamples(Pad pad, List<File> files, final boolean perPad) {
 		final SimpleAssignCommand command = new SimpleAssignCommand(Sample.RENAMED, files, pad, perPad);
-		final Collection<Pad> impactedPads = (Collection<Pad>) command.execute(samples);
+		final Collection<Pad> impactedPads = command.execute(samples);
 
 		refreshImpactedPads(impactedPads);
 
@@ -326,10 +321,9 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 	}
 
 	private void refreshImpactedPads(final Collection<Pad> impactedPads) {
-		Iterator<Pad> it = impactedPads.iterator();
-		while (it.hasNext()) {
-			refreshPadButton((Pad) it.next());
-		}
+        for (Pad impactedPad : impactedPads) {
+            refreshPadButton(impactedPad);
+        }
 	}
 
 	/**
@@ -400,12 +394,12 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 
 	private void refreshParamsArea() {
 		final Component[] widgets = params.getComponents();
-		for (int i = 0; i < widgets.length; i++) {
-			if (widgets[i] instanceof BindingCapable) {
-				BindingCapable component = (BindingCapable) widgets[i];
-				component.load();
-			}
-		}
+        for (Component widget : widgets) {
+            if (widget instanceof BindingCapable) {
+                BindingCapable component = (BindingCapable) widget;
+                component.load();
+            }
+        }
 	}
 
 	public void removeAllSamples() {
@@ -434,8 +428,8 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 		}
 	}
 
-	private final static String htmlSamples(Pad padElement) {
-		final StringBuffer out = new StringBuffer("<html>");
+	private static String htmlSamples(Pad padElement) {
+		final StringBuilder out = new StringBuilder("<html>");
 		for (int i = 0; i < padElement.getLayerNumber(); i++) {
 			final Layer sample = padElement.getLayer(i);
 			final String sampleName = shorten(sample.getSampleName());
@@ -495,7 +489,6 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 
 	/**
 	 * @return A Component that is also BindingCapable
-	 * 
 	 *         When we select another pad, call the setElement() method to
 	 *         update the view
 	 */
@@ -516,11 +509,10 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 
 	/**
 	 * @return A Component that is also BindingCapable
-	 * 
 	 *         Make the Widget panel and keep a reference to it in a collection
 	 *         so that we can collectively call setElement(), load() and save()
 	 *         on them
-	 * 
+	 * <p>
 	 *         When we select another pad, call the setElement() method to
 	 *         update the view
 	 */
@@ -543,27 +535,23 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 					super.makeParameters();
 
 					// play/remove buttons
-					final JPanel layerButtons = new JPanel(new FlowLayout(2, 0, 0));
+					final JPanel layerButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
 					final JButton playButton = new JButton("Play");
 					playButton.setFont(MEDIUM_FONT);
 					layerButtons.add(playButton);
 					final JButton removeButton = new JButton("Clear");
 					removeButton.setFont(MEDIUM_FONT);
 					layerButtons.add(removeButton);
-					final ActionListener actionListener = new ActionListener() {
-
-						public void actionPerformed(ActionEvent e) {
-							final Object source = e.getSource();
-							if (source == playButton) {
-								samples.play(layer);
-							} else if (source == removeButton) {
-								samples.remove(layer);
-								refreshPadButton(pad);
-								load();
-							}
-						}
-
-					};
+					final ActionListener actionListener = e -> {
+                        final Object source = e.getSource();
+                        if (source == playButton) {
+                            samples.play(layer);
+                        } else if (source == removeButton) {
+                            samples.remove(layer);
+                            refreshPadButton(pad);
+                            load();
+                        }
+                    };
 					playButton.addActionListener(actionListener);
 					removeButton.addActionListener(actionListener);
 					add(layerButtons);
@@ -585,26 +573,25 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 
 	public void load() {
 		final Component[] widgets = params.getComponents();
-		for (int i = 0; i < widgets.length; i++) {
-			if (widgets[i] instanceof BindingCapable) {
-				BindingCapable component = (BindingCapable) widgets[i];
-				component.load();
+        for (Component widget : widgets) {
+            if (widget instanceof BindingCapable) {
+                BindingCapable component = (BindingCapable) widget;
+                component.load();
 
-			}
-		}
+            }
+        }
 	}
 
 	public void save() {
 		final Component[] widgets = params.getComponents();
-		for (int i = 0; i < widgets.length; i++) {
-			WidgetPanel component = (WidgetPanel) widgets[i];
-			component.save();
-		}
+        for (Component widget : widgets) {
+            WidgetPanel component = (WidgetPanel) widget;
+            component.save();
+        }
 	}
 
 	/**
 	 * @return A Component that is also BindingCapable
-	 * 
 	 *         When we select another pad, call the setElement() method to
 	 *         update the view
 	 */
@@ -619,7 +606,7 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 		return sliders;
 	}
 
-	public final static String[] offPads(OffIntType type, int padNumber) {
+	public static String[] offPads(OffIntType type, int padNumber) {
 		final Range range = type.getRange();
 		final String[] values = new String[range.getHigh() - range.getLow() + 1];
 		for (int i = 0; i < values.length; i++) {
@@ -636,7 +623,7 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 	/**
 	 * Panel to contain the four widgets (one for each sample layer) for the
 	 * selected pad, which is why it is also BindingCapable
-	 * 
+	 * <p>
 	 * When we select another pad, call the setElement() method to update the
 	 * view
 	 * 
@@ -646,27 +633,27 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 
 		private static final long serialVersionUID = 2008068001960565405L;
 
-		private Pad pad;
+		private final Pad pad;
 
-		protected SamplePanel(Pad pad, LayoutManager arg0) {
+		private SamplePanel(Pad pad, LayoutManager arg0) {
 			super(arg0);
 			this.pad = pad;
 		}
 
 		public void load() {
 			final Component[] widgets = getComponents();
-			for (int i = 0; i < widgets.length; i++) {
-				BindingCapable component = (BindingCapable) widgets[i];
-				component.load();
-			}
+            for (Component widget : widgets) {
+                BindingCapable component = (BindingCapable) widget;
+                component.load();
+            }
 		}
 
 		public void save() {
 			final Component[] widgets = getComponents();
-			for (int i = 0; i < widgets.length; i++) {
-				WidgetPanel component = (WidgetPanel) widgets[i];
-				component.save();
-			}
+            for (Component widget : widgets) {
+                WidgetPanel component = (WidgetPanel) widget;
+                component.save();
+            }
 		}
 
 		public Element getElement() {

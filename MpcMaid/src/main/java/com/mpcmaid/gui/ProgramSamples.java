@@ -59,7 +59,7 @@ public class ProgramSamples extends SampleMatrix {
 
 	public void set(final Layer layer) {
 		final String sampleName = layer.getSampleName();
-		if (sampleName.trim().length() == 0) {
+		if (sampleName.trim().isEmpty()) {
 			remove(layer);
 			return;
 		}
@@ -85,7 +85,7 @@ public class ProgramSamples extends SampleMatrix {
 				final Layer layer = pad.getLayer(i);
 				if (get(layer) != null) {
 					play(layer);
-					if (auditionSamples == 0) {
+					if (auditionSamples == 0) { //FIXME
 						return;// play only first available
 					}
 					// 0 play each in sequence: cannot do yet

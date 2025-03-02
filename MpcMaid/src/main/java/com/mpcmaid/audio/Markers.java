@@ -22,7 +22,7 @@ public class Markers {
 
 	public static final int NONE = -1;
 
-	private final List<Marker> markers = new ArrayList<Marker>();
+	private final List<Marker> markers = new ArrayList<>();
 
 	private int selectedMarker = 0;
 
@@ -92,11 +92,11 @@ public class Markers {
 		int min = 0;
 		if (marker != null) {
 			if (markers.size() > selectedMarker + 1) {
-				final Marker nextMarker = (Marker) markers.get(selectedMarker + 1);
+				final Marker nextMarker = markers.get(selectedMarker + 1);
 				max = nextMarker.getLocation();
 			}
 			if (selectedMarker > 0) {
-				final Marker previousMarker = (Marker) markers.get(selectedMarker - 1);
+				final Marker previousMarker = markers.get(selectedMarker - 1);
 				min = previousMarker.getLocation();
 			}
 			int location = marker.move(ticks);
@@ -113,12 +113,11 @@ public class Markers {
 	}
 
 	public Marker getSelectedMarker() {
-		final Marker marker = (Marker) markers.get(selectedMarker);
-		return marker;
+        return markers.get(selectedMarker);
 	}
 
 	public boolean isUnset() {
-		return markers.size() == 0;
+		return markers.isEmpty();
 	}
 
 	public void deleteSelectedMarker() {
@@ -145,8 +144,7 @@ public class Markers {
 	}
 
 	public float getDuration() {
-		final float duration = (float) maxLocation / samplingRate;
-		return duration;
+        return (float) maxLocation / samplingRate;
 	}
 
 	public int getLocation(final int markerIndex) {
@@ -156,7 +154,7 @@ public class Markers {
 		if (markerIndex >= markers.size()) {
 			return maxLocation;
 		}
-		final Marker marker = (Marker) markers.get(markerIndex);
+		final Marker marker = markers.get(markerIndex);
 		if (marker == null) {
 			return 0;
 		}
@@ -212,7 +210,7 @@ public class Markers {
 		final MidiSequenceBuilder builder = new MidiSequenceBuilder(ppq);
 		final Track track = builder.getTrack();
 		final int n = markers.size();
-		int startTick = 0;
+		int startTick;
 		int key = 35;
 		for (int i = 0; i < n; i++) {
 			final int location = getLocation(i);

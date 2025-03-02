@@ -44,10 +44,9 @@ public class MultiSampleCommand extends ImportCommand {
 		rejectedCount += builder.getWarnings().size();
 
 		// print
-		for (int i = 0; i < multisample.length; i++) {
-			Slot slot = multisample[i];
-			System.out.println(slot);
-		}
+        for (Slot slot : multisample) {
+            System.out.println(slot);
+        }
 
 		// assign
 		final Collection<Pad> impactedPads = new ArrayList<>();

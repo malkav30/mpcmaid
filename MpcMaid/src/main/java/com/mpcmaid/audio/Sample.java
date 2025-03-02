@@ -9,7 +9,6 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.AudioFileFormat.Type;
 
 /**
@@ -35,13 +34,13 @@ public class Sample {
 		return open(audioStream);
 	}
 
-	private static Sample open(final AudioInputStream audioStream) throws LineUnavailableException, IOException {
+	private static Sample open(final AudioInputStream audioStream) throws IOException {
 		final int frameLength = (int) audioStream.getFrameLength();
 		if (frameLength > 44100 * 8 * 2) {
 			throw new IllegalArgumentException("The audio file is too long (must be shorter than 4 bars at 50BPM)");
 		}
 		final AudioFormat format = audioStream.getFormat();
-		final int frameSize = (int) format.getFrameSize();
+		final int frameSize = format.getFrameSize();
 		final byte[] bytes = new byte[frameLength * frameSize];
 		final int result = audioStream.read(bytes);
 		if (result < 0) {
@@ -75,9 +74,9 @@ public class Sample {
 		int sampleIndex = 0;
 		for (int t = 0; t < bytes.length;) {
 			for (int channel = 0; channel < numChannels; channel++) {
-				int low = (int) bytes[t];
+				int low = bytes[t];
 				t++;
-				int high = (int) bytes[t];
+				int high = bytes[t];
 				t++;
 				int sample = (high << 8) + (low & 0x00ff);
 				toReturn[channel][sampleIndex] = sample;
@@ -104,11 +103,9 @@ public class Sample {
 	 */
 	public Sample subRegion(int from, int to) {
 		final int frameLength = to - from;
-		final int frameSize = (int) format.getFrameSize();
+		final int frameSize = format.getFrameSize();
 		final byte[] region = new byte[frameLength * frameSize];
-		for (int i = 0; i < region.length; i++) {
-			region[i] = bytes[from * frameSize + i];
-		}
+        System.arraycopy(bytes, from * frameSize, region, 0, region.length);
 		return new Sample(region, format, region.length);
 	}
 

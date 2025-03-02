@@ -14,7 +14,7 @@ public class MultisampleBuilderTest extends TestCase {
 	public void testNoteName() throws Exception {
 		final List<String> filenames = collectFileNames(1);
 
-		final int commonIndex = MultisampleBuilder.longuestPrefix(filenames);
+		final int commonIndex = MultisampleBuilder.longestPrefix(filenames);
 		// System.out.println(commonIndex);
 
 		int i = 35;

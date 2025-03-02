@@ -33,8 +33,7 @@ public final class Marker implements Comparable<Marker> {
 	}
 
 	public int compareTo(Marker o) {
-		final Marker other = o;
-		return location - other.location;
+		return location - o.location;
 	}
 
 	public String toString() {

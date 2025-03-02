@@ -3,6 +3,7 @@ package com.mpcmaid.gui;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import com.mpcmaid.pgm.Profile;
@@ -20,7 +21,7 @@ public final class Preferences {
 
 	private final static Preferences INSTANCE = new Preferences();
 
-	public final static Preferences getInstance() {
+	public static Preferences getInstance() {
 		return INSTANCE;
 	}
 
@@ -77,7 +78,7 @@ public final class Preferences {
 		save();
 	}
 
-	public static final boolean isMacOsX() {
+	public static boolean isMacOsX() {
 		return System.getProperty("mrj.version") != null;
 	}
 
@@ -88,7 +89,7 @@ public final class Preferences {
 		return new File(System.getProperty("user.home"));
 	}
 
-	private final static File getSettingsDirectory() {
+	private static File getSettingsDirectory() {
 		final File home = getUserPreferencesDirectory();
 		final File settingsDirectory = new File(home, MPCMAID_SETTINGS_DIR);
 		if (!settingsDirectory.exists()) {
@@ -99,15 +100,15 @@ public final class Preferences {
 		return settingsDirectory;
 	}
 
-	private final static Properties getProperties() {
+	private static Properties getProperties() {
 		Properties properties = new Properties();
 		final File home = getSettingsDirectory();
 		final File file = new File(home, "mpcmaid.properties");
 		try {
 			file.createNewFile();
-			properties.load(new FileInputStream(file));
+			properties.load(Files.newInputStream(file.toPath()));
 		} catch (Exception e) {
-			e.printStackTrace();
+			e.printStackTrace(); //FIXME
 			return null;
 		}
 		return properties;
@@ -138,9 +139,9 @@ public final class Preferences {
 
 			final File home = getSettingsDirectory();
 			final File file = new File(home, "mpcmaid.properties");
-			properties.store(new FileOutputStream(file), null);
-		} catch (Exception ignore) {
-			ignore.printStackTrace();
+			properties.store(Files.newOutputStream(file.toPath()), null);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

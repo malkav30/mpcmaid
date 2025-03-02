@@ -77,38 +77,37 @@ public final class MPCMaid {
 		if (showSplash)
 			showSplash();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				final BaseFrame baseFrame;
-				if (programFile != null && programFile.exists()) {
-					baseFrame = new MainFrame(programFile);
-				} else {
-					baseFrame = new MainFrame();
-				}
-				// wait to show the splash
-				if (screen != null) {
-					try {
-						Thread.sleep(1500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				baseFrame.setVisible(true);
-				//baseFrame.show();
+		SwingUtilities.invokeLater(() -> {
+            final BaseFrame baseFrame;
+            if (programFile != null && programFile.exists()) {
+                baseFrame = new MainFrame(programFile);
+            } else {
+                baseFrame = new MainFrame();
+            }
+            // wait to show the splash
+            if (screen != null) {
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            baseFrame.setVisible(true);
+            //baseFrame.show();
 
-				hideSplash();
-			}
-		});
+            hideSplash();
+        });
 	}
 
-	public static final boolean isMacOsX() {
+	public static  boolean isMacOsX() {
 		return System.getProperty("mrj.version") != null;
 	}
 
-	public static final void makeAsNativeAsPossible() {
+	public static  void makeAsNativeAsPossible() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		try {
 			if (isMacOsX()) {
@@ -116,14 +115,16 @@ public final class MPCMaid {
 				System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MPC Maid");
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		try {
 			Preferences.getInstance().load();
-		} catch (Exception ignore) {
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	public static final void showHelp() {
+	public static  void showHelp() {
 		System.err.println("Usage: mpcmaid [-h] [-n] [<program.pgm>]");
 		System.err.println();
 		System.err.println(" -n     Do not show splash screen");

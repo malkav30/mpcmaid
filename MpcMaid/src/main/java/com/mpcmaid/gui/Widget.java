@@ -101,12 +101,12 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		return parameter.getType();
 	}
 
-	public boolean validate(Object o) {
-		return getType().validate(o);
+	public boolean notvalidate(Object o) {
+		return !getType().validate(o);
 	}
 
 	protected void check(final Object o) {
-		if (!validate(o)) {
+		if (notvalidate(o)) {
 			final String msg = "Invalid " + getLabel() + " value: " + o + ".";
 			System.err.println(msg);
 			// JOptionPane.showMessageDialog(null, msg, "Invalid value",
@@ -238,7 +238,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 		protected void check(final Object o) {
 			final Range range = (Range) o;
-			if (!validate(Integer.valueOf(range.getLow()))) {
+			if (notvalidate(range.getLow())) {
 				final String msg = "Invalid " + getLabel() + " value: " + range.getLow() + ".";
 				System.err.println(msg);
 
@@ -246,7 +246,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 				Toolkit.getDefaultToolkit().beep();
 				return;
 			}
-			if (!validate(Integer.valueOf(range.getHigh()))) {
+			if (notvalidate(range.getHigh())) {
 				final String msg = "Invalid " + getLabel() + " value: " + range.getHigh() + ".";
 				System.err.println(msg);
 
@@ -318,12 +318,11 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 		public void load() {
 			final Integer selection = (Integer) element.get(parameter);
-			getComboBox().setSelectedIndex(selection.intValue());
+			getComboBox().setSelectedIndex(selection);
 		}
 
 		public void save() {
-			final int selection = getComboBox().getSelectedIndex();
-			final Integer sel = Integer.valueOf(selection);
+            final Integer sel = getComboBox().getSelectedIndex();
 			check(sel);
 			element.set(parameter, sel);
 		}
@@ -337,7 +336,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 		private static final long serialVersionUID = -454582028253676511L;
 		
-		private String[] values;
+		private final String[] values;
 
 		public OffIntegerField(Element element, Parameter parameter, String[] values) {
 			super(element, parameter);
@@ -367,12 +366,11 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 		public void load() {
 			final Integer selection = (Integer) element.get(parameter);
-			getComboBox().setSelectedIndex(selection.intValue());
+			getComboBox().setSelectedIndex(selection);
 		}
 
 		public void save() {
-			final int selection = getComboBox().getSelectedIndex();
-			final Integer sel = Integer.valueOf(selection);
+            final Integer sel = getComboBox().getSelectedIndex();
 			check(sel);
 			element.set(parameter, sel);
 		}

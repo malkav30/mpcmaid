@@ -2,7 +2,6 @@ package com.mpcmaid.pgm.command;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import com.mpcmaid.pgm.Sample;
 import com.mpcmaid.pgm.SampleCommand;
@@ -25,17 +24,15 @@ public final class ExportCommand implements SampleCommand {
 	}
 
 	public Object execute(SampleMatrix matrix) {
-		final Iterator<Sample> it = matrix.collectAll().iterator();
-		while (it.hasNext()) {
-			Sample sample = it.next();
-			expected++;
-			try {
-				sample.convertTo(dir);
-				exported++;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+        for (Sample sample : matrix.collectAll()) {
+            expected++;
+            try {
+                sample.convertTo(dir);
+                exported++;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 		return getReport();
 	}
 
