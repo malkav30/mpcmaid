@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 
 import com.mpcmaid.pgm.Layer;
 import com.mpcmaid.pgm.MultisampleBuilder;
@@ -20,6 +23,8 @@ import com.mpcmaid.pgm.Sample.Status;
  * @author cyrille martraire
  */
 public class MultiSampleCommand extends ImportCommand {
+
+	private static final Logger logger = System.getLogger(MultiSampleCommand.class.getName());
 
 	private final List<Sample> samples = new ArrayList<>();
 
@@ -44,10 +49,9 @@ public class MultiSampleCommand extends ImportCommand {
 		rejectedCount += builder.getWarnings().size();
 
 		// print
-		for (int i = 0; i < multisample.length; i++) {
-			Slot slot = multisample[i];
-			System.out.println(slot);
-		}
+        for (Slot slot : multisample) {
+            logger.log(Level.INFO, slot);
+        }
 
 		// assign
 		final Collection<Pad> impactedPads = new ArrayList<>();
@@ -56,13 +60,13 @@ public class MultiSampleCommand extends ImportCommand {
 			if (slot != null) {
 				final Pad pad = pgm.getPad(i);
 				final Layer layer = pad.getLayer(0);
-				final Sample sample = (Sample) slot.getSource();
+				final Sample sample = (Sample) slot.source();
 
 				matrix.set(layer, sample);
 
 				layer.setSampleName(sample.getSampleName());
-				layer.setTuning(slot.getTuning());
-				pad.setPadMidiNote(slot.getNote());
+				layer.setTuning(slot.tuning());
+				pad.setPadMidiNote(slot.note());
 				layer.setNoteOn();
 
 				impactedPads.add(pad);

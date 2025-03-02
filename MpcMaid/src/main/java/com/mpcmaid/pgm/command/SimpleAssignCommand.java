@@ -49,7 +49,7 @@ public class SimpleAssignCommand extends ImportCommand {
 		final int n = program.getPadNumber();
 		for (int i = from; i < n; i++) {
 			final Pad pad = program.getPad(i);
-			final int m = pad.getLayerNumber();
+            final int m = Pad.LAYER_NUMBER;
 			for (int j = 0; j < m; j++) {
 				final Layer layer = pad.getLayer(j);
 				if (matrix.get(layer) == null) {
@@ -58,7 +58,7 @@ public class SimpleAssignCommand extends ImportCommand {
 					if (!it.hasNext()) {
 						return impactedPads;
 					}
-					final Sample sample = (Sample) it.next();
+					final Sample sample = it.next();
 					matrix.set(layer, sample);
 
 					layer.setSampleName(sample.getSampleName());

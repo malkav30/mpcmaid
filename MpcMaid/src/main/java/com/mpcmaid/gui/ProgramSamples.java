@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.lang.System.Logger.Level;
+import java.lang.System.Logger;
 
 import com.mpcmaid.pgm.Layer;
 import com.mpcmaid.pgm.Pad;
@@ -17,6 +19,8 @@ import com.mpcmaid.pgm.SampleMatrix;
  * @author cyrille martraire
  */
 public class ProgramSamples extends SampleMatrix {
+
+	private static final Logger logger = System.getLogger(ProgramSamples.class.getName());
 
 	private File path;
 
@@ -51,7 +55,7 @@ public class ProgramSamples extends SampleMatrix {
 	}
 
 	public void set(final Pad pad) {
-		final int layerNumber = pad.getLayerNumber();
+		final int layerNumber = Pad.LAYER_NUMBER;
 		for (int i = 0; i < layerNumber; i++) {
 			set(pad.getLayer(i));
 		}
@@ -59,7 +63,7 @@ public class ProgramSamples extends SampleMatrix {
 
 	public void set(final Layer layer) {
 		final String sampleName = layer.getSampleName();
-		if (sampleName.trim().length() == 0) {
+		if (sampleName.trim().isEmpty()) {
 			remove(layer);
 			return;
 		}
@@ -80,14 +84,11 @@ public class ProgramSamples extends SampleMatrix {
 			return;// do not audition
 		}
 		if (auditionSamples == 0) {
-			final int layerNumber = pad.getLayerNumber();
-			for (int i = 0; i < layerNumber; i++) {
+			for (int i = 0; i < Pad.LAYER_NUMBER; i++) {
 				final Layer layer = pad.getLayer(i);
-				if (get(layer) != null) {
-					play(layer);
-					if (auditionSamples == 0) {
-						return;// play only first available
-					}
+				if (this.get(layer) != null) {
+					this.play(layer);
+					return;// play only first available
 					// 0 play each in sequence: cannot do yet
 				}
 			}
@@ -106,7 +107,7 @@ public class ProgramSamples extends SampleMatrix {
 			}
 			sample.play();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.ERROR, e::getMessage, e);
 		}
 	}
 
@@ -120,7 +121,7 @@ public class ProgramSamples extends SampleMatrix {
 		final int n = program.getPadNumber();
 		for (int i = 0; i < n; i++) {
 			final Pad pad = program.getPad(i);
-			final int m = pad.getLayerNumber();
+			final int m = Pad.LAYER_NUMBER;
 			for (int j = 0; j < m; j++) {
 				final Layer layer = pad.getLayer(j);
 				remove(layer);

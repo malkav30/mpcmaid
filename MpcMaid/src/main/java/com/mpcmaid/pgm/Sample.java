@@ -70,7 +70,7 @@ public final class Sample {
 	 *         program)
 	 */
 	public static Sample findFile(String sampleName, File path) {
-		if (sampleName == null || sampleName.trim().length() == 0) {
+		if (sampleName == null || sampleName.trim().isEmpty()) {
 			return null;
 		}
 		File file = new File(path, sampleName + ".wav");
@@ -150,7 +150,7 @@ public final class Sample {
 		return name;
 	}
 
-	public File getDestinationFile(File dir) throws IOException {
+	public File getDestinationFile(File dir) {
 		final String dstName = getName();
 		if (actualFile == null || dstName == null) {
 			return null;

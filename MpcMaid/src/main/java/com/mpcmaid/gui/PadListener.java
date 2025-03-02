@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.Serial;
 
 /**
  * The listener for each pad button
@@ -12,7 +13,8 @@ import java.awt.event.FocusListener;
  */
 public class PadListener extends FileDragHandler implements ActionListener, FocusListener {
 
-	private static final long serialVersionUID = 8106993173333818375L;
+	@Serial
+    private static final long serialVersionUID = 8106993173333818375L;
 
 	public void actionPerformed(ActionEvent arg0) {
 	}

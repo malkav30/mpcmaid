@@ -7,8 +7,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.Serial;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -31,7 +34,10 @@ import com.mpcmaid.pgm.Parameter.Type;
  */
 public abstract class Widget<T extends JComponent> extends JPanel implements ActionListener, FocusListener, BindingCapable {
 
-	private static final long serialVersionUID = -532729841296280652L;
+	@Serial
+    private static final long serialVersionUID = -532729841296280652L;
+
+	private static final Logger logger = System.getLogger(Widget.class.getName());
 
 	private static final Font MEDIUM_FONT = new Font("Verdana", Font.PLAIN, 12);
 
@@ -46,11 +52,9 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		this.element = element;
 		this.parameter = parameter;
 
-		setupLabel(parameter);
-
-		setupValue();
-
-		setupToolTip(parameter);
+		this.setupLabel(parameter);
+		this.setupValue();
+		this.setupToolTip(parameter);
 	}
 
 	public void load() {
@@ -101,14 +105,14 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		return parameter.getType();
 	}
 
-	public boolean validate(Object o) {
+	public boolean notValidate(Object o) {
 		return getType().validate(o);
 	}
 
 	protected void check(final Object o) {
-		if (!validate(o)) {
+		if (notValidate(o)) {
 			final String msg = "Invalid " + getLabel() + " value: " + o + ".";
-			System.err.println(msg);
+			logger.log(Level.ERROR,msg);
 			// JOptionPane.showMessageDialog(null, msg, "Invalid value",
 			// JOptionPane.ERROR_MESSAGE);
 			onError();
@@ -126,7 +130,8 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 	public static class IntegerField extends Widget<JTextField> {
 
-		private static final long serialVersionUID = 3709006660547691155L;
+		@Serial
+        private static final long serialVersionUID = 3709006660547691155L;
 
 		public IntegerField(Element element, Parameter parameter) {
 			super(element, parameter);
@@ -145,7 +150,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		}
 
 		private JTextField getTextField() {
-			return (JTextField) value;
+			return value;
 		}
 
 		public void load() {
@@ -168,7 +173,8 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 	public static class StringField extends Widget<JTextField> {
 
-		private static final long serialVersionUID = 3200524341632520173L;
+		@Serial
+        private static final long serialVersionUID = 3200524341632520173L;
 
 		public StringField(Element element, Parameter parameter) {
 			super(element, parameter);
@@ -188,7 +194,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		}
 
 		private JTextField getTextField() {
-			return (JTextField) value;
+			return value;
 		}
 
 		public void load() {
@@ -209,7 +215,8 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 	public static class RangeField extends Widget<JTextField> {
 
-		private static final long serialVersionUID = 5633564907524431966L;
+		@Serial
+        private static final long serialVersionUID = 5633564907524431966L;
 
 		private JTextField value2;
 
@@ -238,17 +245,17 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 		protected void check(final Object o) {
 			final Range range = (Range) o;
-			if (!validate(Integer.valueOf(range.getLow()))) {
-				final String msg = "Invalid " + getLabel() + " value: " + range.getLow() + ".";
-				System.err.println(msg);
+			if (notValidate(range.low())) {
+				final String msg = "Invalid " + getLabel() + " value: " + range.low() + ".";
+				logger.log(Level.ERROR,msg);
 
 				value.requestFocus();
 				Toolkit.getDefaultToolkit().beep();
 				return;
 			}
-			if (!validate(Integer.valueOf(range.getHigh()))) {
-				final String msg = "Invalid " + getLabel() + " value: " + range.getHigh() + ".";
-				System.err.println(msg);
+			if (notValidate(range.high())) {
+				final String msg = "Invalid " + getLabel() + " value: " + range.high() + ".";
+				logger.log(Level.ERROR,msg);
 
 				value2.requestFocus();
 				Toolkit.getDefaultToolkit().beep();
@@ -269,17 +276,17 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		}
 
 		private JTextField getTextField() {
-			return (JTextField) value;
+			return value;
 		}
 
 		private JTextField getTextField2() {
-			return (JTextField) value2;
+			return value2;
 		}
 
 		public void load() {
 			final Range range = (Range) element.get(parameter);
-			getTextField().setText(String.valueOf(range.getLow()));
-			getTextField2().setText(String.valueOf(range.getHigh()));
+			getTextField().setText(String.valueOf(range.low()));
+			getTextField2().setText(String.valueOf(range.high()));
 		}
 
 		public void save() {
@@ -294,7 +301,8 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 	public static class ComboField extends Widget<JComboBox<String>> {
 
-		private static final long serialVersionUID = 1116472605960451997L;
+		@Serial
+        private static final long serialVersionUID = 1116472605960451997L;
 
 		public ComboField(Element element, Parameter parameter) {
 			super(element, parameter);
@@ -303,7 +311,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 		protected void setupValue() {
 			final EnumType type = (EnumType) parameter.getType();
-			value = new JComboBox<String>(type.getValues());
+			value = new JComboBox<>(type.getValues());
 			value.setAlignmentX(LEFT_ALIGNMENT);
 			value.setFont(MEDIUM_FONT);
 			add(value);
@@ -313,17 +321,16 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		}
 
 		private JComboBox<String> getComboBox() {
-			return (JComboBox<String>) value;
+			return value;
 		}
 
 		public void load() {
 			final Integer selection = (Integer) element.get(parameter);
-			getComboBox().setSelectedIndex(selection.intValue());
+			getComboBox().setSelectedIndex(selection);
 		}
 
 		public void save() {
-			final int selection = getComboBox().getSelectedIndex();
-			final Integer sel = Integer.valueOf(selection);
+            final Integer sel = getComboBox().getSelectedIndex();
 			check(sel);
 			element.set(parameter, sel);
 		}
@@ -335,9 +342,10 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 	public static class OffIntegerField extends Widget<JComboBox<String>> {
 
-		private static final long serialVersionUID = -454582028253676511L;
+		@Serial
+        private static final long serialVersionUID = -454582028253676511L;
 		
-		private String[] values;
+		private final String[] values;
 
 		public OffIntegerField(Element element, Parameter parameter, String[] values) {
 			super(element, parameter);
@@ -351,7 +359,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		}
 
 		protected void setupValuePost() {
-			value = new JComboBox<String>(values);
+			value = new JComboBox<>(values);
 			value.setAlignmentX(LEFT_ALIGNMENT);
 			value.setFont(MEDIUM_FONT);
 			add(value);
@@ -362,17 +370,16 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		}
 
 		private JComboBox<String> getComboBox() {
-			return (JComboBox<String>) value;
+			return value;
 		}
 
 		public void load() {
 			final Integer selection = (Integer) element.get(parameter);
-			getComboBox().setSelectedIndex(selection.intValue());
+			getComboBox().setSelectedIndex(selection);
 		}
 
 		public void save() {
-			final int selection = getComboBox().getSelectedIndex();
-			final Integer sel = Integer.valueOf(selection);
+            final Integer sel = getComboBox().getSelectedIndex();
 			check(sel);
 			element.set(parameter, sel);
 		}
@@ -384,7 +391,8 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 
 	public static class TuningField extends Widget<JTextField> {
 
-		private static final long serialVersionUID = -1579155864749957680L;
+		@Serial
+        private static final long serialVersionUID = -1579155864749957680L;
 
 		public TuningField(Layer element, Parameter parameter) {
 			super(element, parameter);
@@ -409,7 +417,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		}
 
 		private JTextField getTextField() {
-			return (JTextField) value;
+			return value;
 		}
 
 		private Layer getSampleElement() {
@@ -428,7 +436,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 			final String text = getTextField().getText();
 			final Double v = Double.valueOf(text);
 
-			if (!parameter.getType().validate(v)) {
+			if (parameter.getType().validate(v)) {
 				onError();
 				return;
 			}

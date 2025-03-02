@@ -2,27 +2,11 @@ package com.mpcmaid.audio;
 
 /**
  * Represents a location range
- * 
+ *
  * @author cyrille martraire
  */
-public final class LocationRange {
+public record LocationRange(int from, int to) {
 
-	private final int from;
-
-	private final int to;
-
-	public LocationRange(int from, int to) {
-		this.from = from;
-		this.to = to;
-	}
-
-	public int getFrom() {
-		return from;
-	}
-
-	public int getTo() {
-		return to;
-	}
 
 	public int getMidLocation() {
 		return (from + to) / 2;

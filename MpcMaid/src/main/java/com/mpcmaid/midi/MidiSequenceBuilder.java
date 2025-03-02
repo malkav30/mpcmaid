@@ -1,14 +1,10 @@
 package com.mpcmaid.midi;
 
+import javax.sound.midi.*;
 import java.io.File;
 import java.io.IOException;
-
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiEvent;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.ShortMessage;
-import javax.sound.midi.Track;
+import java.lang.System.Logger.Level;
+import java.lang.System.Logger;
 
 /**
  * A builder to create a MIDI sequence that can be played or exported to file.
@@ -17,13 +13,15 @@ import javax.sound.midi.Track;
  */
 public final class MidiSequenceBuilder {
 
+	private static final Logger logger = System.getLogger(MidiSequenceBuilder.class.getName());
+
 	private Sequence sequence;
 
 	public MidiSequenceBuilder(final int ppq) {
 		try {
 			sequence = new Sequence(Sequence.PPQ, ppq);
 		} catch (InvalidMidiDataException e) {
-			e.printStackTrace();
+			logger.log(Level.ERROR, e::getMessage, e);
 		}
 	}
 
@@ -52,7 +50,7 @@ public final class MidiSequenceBuilder {
 			track.add(new MidiEvent(on, startTick));
 			track.add(new MidiEvent(off, startTick + tickLength));
 		} catch (InvalidMidiDataException e) {
-			e.printStackTrace();
+			logger.log(Level.ERROR, e::getMessage, e);
 		}
 	}
 

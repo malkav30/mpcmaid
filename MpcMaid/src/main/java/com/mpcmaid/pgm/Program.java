@@ -1,18 +1,17 @@
 package com.mpcmaid.pgm;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 /**
  * Represents an MPC1000 Program (*.pgm file). Note that a program only declares
  * how to deal with samples, it does not contain any actual sound.
- * 
+ * <p>
  * The MPC1000 file format used was provided by Stephen Norum on his website:
- * http://mybunnyhug.com/fileformats/pgm/ Many thanks for sharing this format
+ * <a href="http://mybunnyhug.com/fileformats/pgm/">...</a> Many thanks for sharing this format
  * Stephen!
- * 
+ *
  * @author cyrille martraire
  */
 @SuppressWarnings("unused")
@@ -51,7 +50,8 @@ import java.io.InputStream;
 		return new Parameter[] { MIDI_PROGRAM_CHANGE };
 	}
 
-	protected static final void assertIn(final int min, final int value, final int max, String param) {
+	@SuppressWarnings("SameParameterValue")
+    protected static void assertIn(final int min, final int value, final int max, String param) {
 		if (value < min || value > max) {
 			final String msg = "Invalid " + param + " value: " + value + "; must be in [" + min + ".." + max + "]";
 			throw new IllegalArgumentException(msg);
@@ -62,7 +62,9 @@ import java.io.InputStream;
 		return new Pad(this, pad);
 	}
 
-	public int getPadNumber() {
+	@SuppressWarnings("SameReturnValue")
+    public int getPadNumber() {
+		// keep it a variable, MPC500 has only four banks of 12 pads => 48
 		return 64;
 	}
 
@@ -71,7 +73,9 @@ import java.io.InputStream;
 		return new Slider(this, slider);
 	}
 
-	public int getSlideNumber() {
+	@SuppressWarnings("SameReturnValue")
+    public int getSlideNumber() {
+		// keep it a variable, MPC500 has only one slider
 		return 2;
 	}
 
@@ -86,7 +90,7 @@ import java.io.InputStream;
 
 	public static Program open(final File file) {
 		try {
-			final ByteBuffer buffer = ByteBuffer.open(new FileInputStream(file), FILE_LENGTH);
+			final ByteBuffer buffer = ByteBuffer.open(Files.newInputStream(file.toPath()), FILE_LENGTH);
 			return new Program(buffer);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("The file " + file.getName() + " is not a valid MPC1000 pgm file.");
@@ -105,7 +109,7 @@ import java.io.InputStream;
 	public void save(final File file) {
 		try {
 			final ByteBuffer byteBuffer = (ByteBuffer) getBuffer();
-			byteBuffer.save(new FileOutputStream(file));
+			byteBuffer.save(Files.newOutputStream(file.toPath()));
 		} catch (Exception e) {
 			throw new IllegalArgumentException("The file " + file.getName() + " is not a valid MPC1000 pgm file.");
 		}

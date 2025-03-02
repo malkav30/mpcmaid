@@ -12,7 +12,7 @@ Basic Operations:
 Advanced Features:
  Slicing tool: Drag and drop your loop file (no longer than 2 bars) to have it chopped into slices based on a beat detection mechanism. Then directly export the chopped slices as multiple .WAV files, one corresponding .PGM program file and one MIDI groove .MID file.
  Multisample Creation: On drag and drop of .wav files with a consistent naming (that includes the note name, e-g "C#3", "E5" or "D 4"), you can automatically create Multisample program: MPC Maid calculates the allocation of the samples across pads and the tuning of each pad to reconstitute a complete chromatic scale.
- Batch Create Program: Automatically creates a program (.pgm) that lists every .wav sample in each directory and sub-directory, recursively from a given base directory. This allows for instant conversion of any .wav sound library into an MPC-readable library.
+ Batch Create Program: Automatically creates a program (.pgm) that lists every .wav sample in each directory and subdirectory, recursively from a given base directory. This allows for instant conversion of any .wav sound library into an MPC-readable library.
  Copy Settings to All Pads: You want to quickly change parameters for every pad? Set your parameters on one pad, then copy them to every other pad, except of course the sample name, tuning and midi note.
 
 

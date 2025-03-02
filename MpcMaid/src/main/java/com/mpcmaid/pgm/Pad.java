@@ -27,7 +27,9 @@ public final class Pad extends BaseElement {
 
 	private static final int PAD_LENGTH = 0xA4;// length of pad section
 
-	protected Pad(final Program parent, int padIndex) {
+	public static final int LAYER_NUMBER = 4;
+
+	Pad(final Program parent, int padIndex) {
 		super(parent, PAD_SECTION, padIndex, PAD_LENGTH);
 		Program.assertIn(0, padIndex, 63, "pad");
 	}
@@ -50,7 +52,7 @@ public final class Pad extends BaseElement {
 	}
 
 	public BaseElement getFilter(int i) {
-		return (i == 0) ? (BaseElement) getFilter1() : (BaseElement) getFilter2();
+		return (i == 0) ? getFilter1() : getFilter2();
 	}
 
 	public PadFilter1 getFilter1() {
@@ -97,7 +99,7 @@ public final class Pad extends BaseElement {
 
 	public Object get(Parameter parameter) {
 		if (parameter.equals(PAD_MIDI_NOTE_VALUE)) {
-			return Integer.valueOf(getPadMidiNote() - 35);
+			return getPadMidiNote() - 35;
 		}
 		return super.get(parameter);
 	}
@@ -124,18 +126,14 @@ public final class Pad extends BaseElement {
 			final BaseElement page = pages[j];
 			page.copyFrom(sourcePages[j], ignoreParams);
 		}
-		for (int j = 0; j < getLayerNumber(); j++) {
+		for (int j = 0; j < LAYER_NUMBER; j++) {
 			Layer layer = getLayer(j);
 			final Layer sourceLayer = sourcePad.getLayer(j);
 			layer.copyFrom(sourceLayer, ignoreParams);
 		}
 	}
 
-	public int getLayerNumber() {
-		return 4;
-	}
-
-	private final static String[] notes() {
+	private static String[] notes() {
 		final String[] noteNames = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 		final String[] notes = new String[64];
 		for (int i = 0; i < notes.length; i++) {

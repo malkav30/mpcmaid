@@ -25,10 +25,10 @@ public class BareBonesBrowserLaunch {
 		try {
 			if (osName.startsWith("Mac OS")) {
 				Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
-				Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[] { String.class });
-				openURL.invoke(null, new Object[] { url });
+				Method openURL = fileMgr.getDeclaredMethod("openURL", String.class);
+				openURL.invoke(null, url);
 			} else if (osName.startsWith("Windows"))
-				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+				Runtime.getRuntime().exec(new String[]{"rundll32 url.dll,FileProtocolHandler " + url});
 			else { // assume Unix or Linux
 				String[] browsers = { "firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape" };
 				String browser = null;

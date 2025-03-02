@@ -52,39 +52,29 @@ package com.mpcmaid.gui;
 
  */
 
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-
 import apple.dts.samplecode.osxadapter.OSXAdapter;
-
 import com.mpcmaid.audio.SamplePlayer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.Serial;
+import java.lang.System.Logger.Level;
+import java.lang.System.Logger;
 
 /**
  * Main Frame subclass, to be subclassed again on each action method (open,
- * saveAs.. etc)
+ * saveAs, etc.)
  * 
  * @author cyrille martraire
  */
 public class BaseFrame extends JFrame implements ActionListener {
 
-	private static final long serialVersionUID = -8081595568054819394L;
+	private static final Logger logger = System.getLogger(BaseFrame.class.getName());
+
+	@Serial
+    private static final long serialVersionUID = -8081595568054819394L;
 
 	protected static int windowCounter = -1;
 
@@ -98,10 +88,10 @@ public class BaseFrame extends JFrame implements ActionListener {
 
 	// Check that we are on Mac OS X. This is crucial to loading and using the
 	// OSXAdapter class.
-	public static boolean MAC_OS_X = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
+	public static final boolean MAC_OS_X = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
 
 	// Ask AWT which menu modifier we should be using.
-	protected final static int MENU_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+	protected final static int MENU_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
 	public BaseFrame() {
 		super("MPCMaid");
@@ -115,7 +105,7 @@ public class BaseFrame extends JFrame implements ActionListener {
 	protected void initMenuBar() {
 		JMenu fileMenu = new JMenu("File");
 		JMenuBar mainMenuBar = new JMenuBar();
-		mainMenuBar.add(fileMenu = new JMenu("File"));
+		mainMenuBar.add(fileMenu);
 
 		fileMenu.add(newMI = new JMenuItem("New"));
 		newMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, MENU_MASK));
@@ -194,9 +184,8 @@ public class BaseFrame extends JFrame implements ActionListener {
 		// Determine the offset value and stagger new windows
 		// (with a reset every ten windows). A somewhat
 		// unscientific mechanism, but it works well enough.
-		int offset = 0;
 		if ((windowCounter % 10) > 0) {
-			offset = ((windowCounter) % 10) * 20 + 20;
+			int offset = ((windowCounter) % 10) * 20 + 20;
 			this.setLocation(Double.valueOf(getLocation().getX() + offset - 20).intValue(), Double.valueOf(getLocation().getY()
 					+ offset).intValue());
 		}
@@ -205,7 +194,7 @@ public class BaseFrame extends JFrame implements ActionListener {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 
-		loadInitialDocument();
+		//loadInitialDocument();
 		makeGUI();
 		makeAboutDialog();
 		makePrefsDialog();
@@ -216,10 +205,7 @@ public class BaseFrame extends JFrame implements ActionListener {
 
 	}
 
-	protected void loadInitialDocument() {
-	}
-
-	public void makePrefsDialog() {
+    public void makePrefsDialog() {
 
 	}
 
@@ -231,24 +217,12 @@ public class BaseFrame extends JFrame implements ActionListener {
 		JButton play = new JButton("Play1");
 
 		final Container contentPane = getContentPane();
-		contentPane.setLayout(new FlowLayout(2));
+		contentPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(play);
-		play.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				SamplePlayer.getInstance().play(new File("clap 1.WAV"));
-			}
-
-		});
+		play.addActionListener(e -> SamplePlayer.getInstance().play(new File("clap 1.WAV")));
 		JButton play2 = new JButton("Play2");
 		contentPane.add(play2);
-		play2.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				SamplePlayer.getInstance().play(new File("bullshit1.wav"));
-			}
-
-		});
+		play2.addActionListener(e -> SamplePlayer.getInstance().play(new File("bullshit1.wav")));
 	}
 
 	// Generic registration with the Mac OS X application menu
@@ -262,13 +236,12 @@ public class BaseFrame extends JFrame implements ActionListener {
 				// all the methods we wish to
 				// use as delegates for various
 				// com.apple.eawt.ApplicationListener methods
-				OSXAdapter.setQuitHandler(this, getClass().getDeclaredMethod("quit", (Class[]) null));
-				OSXAdapter.setAboutHandler(this, getClass().getDeclaredMethod("about", (Class[]) null));
-				OSXAdapter.setPreferencesHandler(this, getClass().getDeclaredMethod("preferences", (Class[]) null));
-				OSXAdapter.setFileHandler(this, getClass().getDeclaredMethod("loadFile", new Class[] { String.class }));
+				OSXAdapter.setQuitHandler(this, getClass().getDeclaredMethod("quit", (Class<?>) null));
+				OSXAdapter.setAboutHandler(this, getClass().getDeclaredMethod("about", (Class<?>) null));
+				OSXAdapter.setPreferencesHandler(this, getClass().getDeclaredMethod("preferences", (Class<?>) null));
+				OSXAdapter.setFileHandler(this, getClass().getDeclaredMethod("loadFile", String.class));
 			} catch (Exception e) {
-				System.err.println("Error while loading the OSXAdapter:");
-				e.printStackTrace();
+				logger.log(Level.ERROR,"Error while loading the OSXAdapter: " + e.getMessage(),e);
 			}
 		}
 	}
@@ -340,7 +313,7 @@ public class BaseFrame extends JFrame implements ActionListener {
 	}
 
 	public void close() {
-		checkOnClose();
+		//checkOnClose();
 		setVisible(false);
 
 		windowCounter--;
@@ -350,23 +323,19 @@ public class BaseFrame extends JFrame implements ActionListener {
 
 	}
 
-	protected void checkOnClose() {
-
-	}
-
 	public void save() {
-		System.out.println(getTitle());
-		System.out.println("Save...");
+		logger.log(Level.INFO, getTitle());
+		logger.log(Level.INFO, "Save...");
 	}
 
 	public void saveAs() {
-		System.out.println(getTitle());
-		System.out.println("Save As...");
+		logger.log(Level.INFO, getTitle());
+		logger.log(Level.INFO, "Save As...");
 	}
 
 	public void export() {
-		System.out.println(getTitle());
-		System.out.println("Export...");
+		logger.log(Level.INFO, getTitle());
+		logger.log(Level.INFO, "Export...");
 	}
 
 	public String toString() {

@@ -1,13 +1,10 @@
 package com.mpcmaid.audio;
 
+import javax.sound.sampled.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
+import java.lang.System.Logger.Level;
+import java.lang.System.Logger;
 
 /**
  * A sample-playing thread which uses single dataline to play samples.
@@ -15,6 +12,8 @@ import javax.sound.sampled.SourceDataLine;
 public class AudioWorker extends Thread {
 
 	private final BlockingQueue<Sample> clipQueue;
+
+	private static final Logger logger = System.getLogger(AudioWorker.class.getName());
 
 	AudioWorker(BlockingQueue<Sample> queue) {
 		this.clipQueue = queue;
@@ -27,11 +26,12 @@ public class AudioWorker extends Thread {
 	 */
 	public void run() {
 		SourceDataLine dataLine = null;
-		while (true) {
+        //noinspection
+        while (true) {
 			try {
 				Sample sample;
 				try {
-					sample = (Sample) clipQueue.poll(5, TimeUnit.SECONDS);
+					sample = clipQueue.poll(5, TimeUnit.SECONDS);
 					if (sample == null) {
 						if (dataLine != null && dataLine.isOpen() && !dataLine.isRunning()) {
 							dataLine.close();
@@ -46,7 +46,7 @@ public class AudioWorker extends Thread {
 					}
 					continue;
 				}
-				AudioFormat format = sample.getFormat();
+				AudioFormat format = sample.format();
 				if (dataLine == null) {
 					DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
 					dataLine = (SourceDataLine) AudioSystem.getLine(info);
@@ -64,14 +64,10 @@ public class AudioWorker extends Thread {
 				if (!dataLine.isRunning())
 					dataLine.start();
 
-				dataLine.write(sample.getBytes(), 0, sample.getBytes().length);
+				dataLine.write(sample.bytes(), 0, sample.bytes().length);
 				//dataLine.close();
-			} catch (LineUnavailableException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (Throwable t) {
-				t.printStackTrace();
+			} catch (LineUnavailableException | IllegalArgumentException e) {
+				logger.log(Level.ERROR, e::getMessage, e);
 			}
 		}
 	}

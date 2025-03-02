@@ -1,27 +1,21 @@
 package com.mpcmaid.gui;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.*;
+import java.io.*;
+import java.nio.file.Files;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 public class Utils {
+
+	private static final Logger logger = System.getLogger(Utils.class.getName());
 
 	public static final String EXTENSION = ".WAV";
 
 	/**
 	 * @return true if the given file has the expected extension
 	 */
-	public final static boolean hasCorrectExtension(final File file) {
+	public static boolean hasCorrectExtension(final File file) {
 		return file.getName().toUpperCase().endsWith(EXTENSION);
 	}
 
@@ -33,12 +27,11 @@ public class Utils {
 	 * @return The given name without its extension (the term after the last dot)
 	 */
 	public static String noExtension(final String name) {
-		final String s = name;
-		final int indexOf = s.lastIndexOf('.');
+        final int indexOf = name.lastIndexOf('.');
 		if (indexOf != -1) {
-			return s.substring(0, indexOf);
+			return name.substring(0, indexOf);
 		}
-		return s;
+		return name;
 	}
 
 	/**
@@ -73,17 +66,17 @@ public class Utils {
 		if (brutal) {
 			return s;
 		}
-		String s2 = null;
+		String s2;
 		while (true) {
 			s2 = escapeEnding(s);
-			if (s == s2) {
+			if (s.equals(s2)) {
 				return s.trim();
 			}
 			s = s2;
 		}
 	}
 
-	private final static String escapeEnding(final String s) {
+	private static String escapeEnding(final String s) {
 		if (s.endsWith(".")) {
 			return s.substring(0, s.length() - 1);
 		}
@@ -97,9 +90,9 @@ public class Utils {
 	}
 
 	// File utils
-	public final static void copy(final File src, final File dst) throws IOException {
-		final InputStream in = new FileInputStream(src);
-		final OutputStream out = new FileOutputStream(dst);
+	public static void copy(final File src, final File dst) throws IOException {
+		final InputStream in = Files.newInputStream(src.toPath());
+		final OutputStream out = Files.newOutputStream(dst.toPath());
 
 		// Transfer bytes from in to out
 		final byte[] buf = new byte[1024];
@@ -121,30 +114,28 @@ public class Utils {
 	 * 
 	 * @param src the source file to convert
 	 * @param dst the destination file to write
-	 * @throws IOException
-	 */
+     */
 	public static void resample(final File src, final File dst) throws IOException {
 		try (FileInputStream in = new FileInputStream(src); BufferedInputStream bis = new BufferedInputStream(in)){
 			AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
 			AudioFormat oldFormat = ais.getFormat();
 			AudioFormat mpcFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, oldFormat.getChannels(), 2*oldFormat.getChannels(), 44100, false);
 			if (isWrongFormat(ais)) {
-				System.out.println("Need to convert sample "+src.getName());
+				logger.log(Level.INFO, "Need to convert sample "+src.getName());
 				AudioInputStream converted = AudioSystem.getAudioInputStream(mpcFormat, ais);
 				AudioSystem.write(converted, AudioFileFormat.Type.WAVE, dst);
 			} else {
 				// no need to convert, we copy
 				Utils.copy(src, dst);
 			}
-			return;
-		} catch (UnsupportedAudioFileException e) {
+        } catch (UnsupportedAudioFileException e) {
 			// by default, we copy on wrong format error
 			Utils.copy(src, dst);
 			throw new IOException("Got unsupported audio file, it was copied without modification !");
 		}
 	}
 
-	/** Returns true if the old format is "less or equal" than the good format, i.e has lower or equal bit depth and lower or equal samplerate */
+	/** Returns true if the old format is "less or equal" than the good format, i.e. has lower or equal bit depth and lower or equal samplerate */
 	private static boolean isWrongFormat(AudioInputStream stream) {
 		return stream.getFormat().getSampleRate() > 44100 || stream.getFormat().getSampleSizeInBits() > 16;
 	}

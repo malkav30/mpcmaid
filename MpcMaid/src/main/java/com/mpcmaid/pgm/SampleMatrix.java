@@ -1,6 +1,7 @@
 package com.mpcmaid.pgm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,37 +25,31 @@ public class SampleMatrix {
 
 	public int size() {
 		int size = 0;
-		for (int i = 0; i < cells.length; i++) {
-			final Sample[] layers = cells[i];
-			for (int j = 0; j < layers.length; j++) {
-				if (layers[j] != null) {
-					size++;
-				}
-			}
-		}
+        for (final Sample[] layers : cells) {
+            for (Sample layer : layers) {
+                if (layer != null) {
+                    size++;
+                }
+            }
+        }
 		return size;
 	}
 
 	public void clear() {
-		for (int i = 0; i < cells.length; i++) {
-			final Sample[] layers = cells[i];
-			for (int j = 0; j < layers.length; j++) {
-				layers[j] = null;
-			}
-		}
+        for (final Sample[] layers : cells) {
+            Arrays.fill(layers, null);
+        }
 	}
 
 	public List<Sample> collectAll() {
 		final List<Sample> list = new ArrayList<>();
-		for (int i = 0; i < cells.length; i++) {
-			final Sample[] layers = cells[i];
-			for (int j = 0; j < layers.length; j++) {
-				final Sample sample = layers[j];
-				if (sample != null) {
-					list.add(sample);
-				}
-			}
-		}
+        for (final Sample[] layers : cells) {
+            for (final Sample sample : layers) {
+                if (sample != null) {
+                    list.add(sample);
+                }
+            }
+        }
 		return list;
 	}
 

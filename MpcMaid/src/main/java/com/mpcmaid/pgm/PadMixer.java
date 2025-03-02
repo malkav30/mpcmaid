@@ -22,7 +22,7 @@ public final class PadMixer extends BaseElement {
 
 	public final static Parameter[] PARAMETERS = { MIXER_LEVEL, MIXER_PAN, OUTPUT, FX_SEND, FX_SEND_LEVEL };
 
-	protected PadMixer(final Pad parent) {
+	PadMixer(final Pad parent) {
 		super(parent);
 	}
 

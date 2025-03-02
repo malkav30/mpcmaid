@@ -42,14 +42,14 @@ public class BatchCreateCommand {
 	public void batchCreate(File path) {
 		final File[] memberFiles = path.listFiles();
 		boolean hasPgm = false;
-		for (int i = 0; i < memberFiles.length; i++) {
-			final File file = memberFiles[i];
-			if (file.isDirectory()) {
-				batchCreate(file);
-			} else if (file.getName().toLowerCase().endsWith(".pgm")) {
-				hasPgm = true;
-			}
-		}
+        assert memberFiles != null;
+        for (final File file : memberFiles) {
+            if (file.isDirectory()) {
+                batchCreate(file);
+            } else if (file.getName().toLowerCase().endsWith(".pgm")) {
+                hasPgm = true;
+            }
+        }
 		if (hasPgm) {
 			return;
 		}
@@ -69,18 +69,17 @@ public class BatchCreateCommand {
 			pgmPostfix++;
 		}
 
-		for (int i = 0; i < memberFiles.length; i++) {
-			final File file = memberFiles[i];
-			if (!file.isDirectory() && file.getName().toLowerCase().endsWith(".wav")) {
-				list.add(file);
-			}
-			if (list.size() == padNumber) {
-				createProgram(pgm, new File(path, listingName + page + ".pgm"), list);
-				page++;
-				list.clear();
-			}
+        for (final File file : memberFiles) {
+            if (!file.isDirectory() && file.getName().toLowerCase().endsWith(".wav")) {
+                list.add(file);
+            }
+            if (list.size() == padNumber) {
+                createProgram(pgm, new File(path, listingName + page + ".pgm"), list);
+                page++;
+                list.clear();
+            }
 
-		}
+        }
 		createProgram(pgm, new File(path, listingName + page + ".pgm"), list);
 	}
 

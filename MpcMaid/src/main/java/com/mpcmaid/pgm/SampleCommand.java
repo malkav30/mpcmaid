@@ -1,7 +1,7 @@
 package com.mpcmaid.pgm;
 
 /**
- * A closure to execute agaisnt this sample matrix
+ * A closure to execute against this sample matrix
  * 
  * @pattern Command
  * 

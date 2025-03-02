@@ -1,12 +1,16 @@
 package com.mpcmaid.pgm;
 
-import java.io.File;
-
 import junit.framework.TestCase;
+
+import java.io.File;
+import java.lang.System.Logger.Level;
+import java.lang.System.Logger;
 
 public class ProgramTest extends TestCase {
 
-	public void testRead() throws Exception {
+	private static final Logger logger = System.getLogger(ProgramTest.class.getName());
+
+	public void testRead() {
 		Program pgm = Program.open(getClass().getResourceAsStream("test.pgm"));
 
 		// read sample name
@@ -16,15 +20,15 @@ public class ProgramTest extends TestCase {
 		final int padNumber = pgm.getPadNumber();
 		for (int i = 0; i < padNumber; i++) {
 			final Pad pad = pgm.getPad(i);
-			System.out.println(pad + " fxSendLevel=" + pad.getMixer().get(PadMixer.FX_SEND_LEVEL) + " note: "
+			logger.log(Level.INFO, pad + " fxSendLevel=" + pad.getMixer().get(PadMixer.FX_SEND_LEVEL) + " note: "
 					+ pad.getPadMidiNote());
 
-			final int sampleNumber = pad.getLayerNumber();
+            final int sampleNumber = Pad.LAYER_NUMBER;
 			for (int j = 0; j < sampleNumber; j++) {
 				final Layer sample = pad.getLayer(j);
 
 				final String playModeLabel = (sample.isOneShot()) ? "One Shot" : "Note On";
-				System.out.println(sample + ": " + sample.getSampleName() + " level=" + sample.getLevel()
+				logger.log(Level.INFO, sample + ": " + sample.getSampleName() + " level=" + sample.getLevel()
 						+ " playMode=" + playModeLabel + " tuning=" + sample.getTuning());
 			}
 
@@ -36,7 +40,7 @@ public class ProgramTest extends TestCase {
 		final String sampleName = "tomlow";
 		padLayer.setSampleName(sampleName);
 		final String sampleName2 = padLayer.getSampleName();
-		System.out.println(sampleName + "--" + sampleName2 + "--");
+		logger.log(Level.INFO, sampleName + "--" + sampleName2 + "--");
 		assertEquals(sampleName.trim(), sampleName2);
 		assertEquals(-0.5, padLayer.getTuning(), 0);
 

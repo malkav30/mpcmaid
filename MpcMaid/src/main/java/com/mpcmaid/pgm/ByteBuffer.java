@@ -28,9 +28,7 @@ public class ByteBuffer implements Buffer {
 
 	public ByteBuffer(ByteBuffer other) {
 		this(other.bytes.length);
-		for (int i = 0; i < bytes.length; i++) {
-			bytes[i] = other.bytes[i];
-		}
+        System.arraycopy(other.bytes, 0, bytes, 0, bytes.length);
 	}
 
 	public String getString(final int offset) {
@@ -58,7 +56,7 @@ public class ByteBuffer implements Buffer {
 
 	public int getInt(final int index) {
 		return ((bytes[index + 3] & 0xff) << 24) | ((bytes[index + 2] & 0xff) << 16) | ((bytes[index + 1] & 0xff) << 8)
-				| ((bytes[index + 0] & 0xff));
+				| ((bytes[index] & 0xff));
 	}
 
 	public void setInt(final int index, final int value) {
@@ -92,40 +90,22 @@ public class ByteBuffer implements Buffer {
 	}
 
 	public void setRange(int index, Range range) {
-		setByte((index + LOW), range.getLow());
-		setByte((index + HIGH), range.getHigh());
+		setByte((index + LOW), range.low());
+		setByte((index + HIGH), range.high());
 	}
 
 	public static ByteBuffer open(final InputStream fis, final int length) throws IOException {
 		final byte[] bytes = new byte[length];
-		try {
-			fis.read(bytes);
-			fis.close();
-		} catch (IOException e) {
-			throw e;
-		} finally {
-			try {
-				fis.close();
-			} catch (IOException e) {
-				throw e;
-			}
+        try (fis) {
+           fis.read(bytes); //FIXME
 		}
 		return new ByteBuffer(bytes);
 	}
 
 	public void save(final OutputStream fos) throws IOException {
-		try {
-			fos.write(bytes);
-			fos.close();
-		} catch (IOException e) {
-			throw e;
-		} finally {
-			try {
-				fos.close();
-			} catch (IOException e) {
-				throw e;
-			}
-		}
+        try (fos) {
+            fos.write(bytes);
+        }
 	}
 
 	public String toString() {

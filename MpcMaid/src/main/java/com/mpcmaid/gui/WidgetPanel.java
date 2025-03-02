@@ -2,6 +2,9 @@ package com.mpcmaid.gui;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.io.Serial;
+import java.lang.System.Logger.Level;
+import java.lang.System.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,7 +27,10 @@ import com.mpcmaid.pgm.Parameter.RangeType;
  */
 public class WidgetPanel extends JPanel implements BindingCapable {
 
-	private static final long serialVersionUID = -8139985486559953248L;
+	private static final Logger logger = System.getLogger(WidgetPanel.class.getName());
+
+	@Serial
+    private static final long serialVersionUID = -8139985486559953248L;
 
 	private final Element element;
 
@@ -41,10 +47,9 @@ public class WidgetPanel extends JPanel implements BindingCapable {
 
 	protected void makeParameters() {
 		final Parameter[] parameters = element.getParameters();
-		for (int j = 0; j < parameters.length; j++) {
-			final Parameter parameter = parameters[j];
-			makeParameter(parameter);
-		}
+        for (final Parameter parameter : parameters) {
+            makeParameter(parameter);
+        }
 	}
 
 	protected void makeParameter(final Parameter parameter) {
@@ -103,31 +108,29 @@ public class WidgetPanel extends JPanel implements BindingCapable {
 
 	public void load() {
 		final Component[] widgets = getComponents();
-		for (int i = 0; i < widgets.length; i++) {
-			if (widgets[i] instanceof BindingCapable) {
-				BindingCapable component = (BindingCapable) widgets[i];
-				try {
-					component.load();
-				} catch (Exception e) {
-					System.out.println("xception: " + component + " " + i);
-					e.printStackTrace();
-				}
-			}
-		}
+        for (Component widget : widgets) {
+            if (widget instanceof BindingCapable component) {
+                try {
+                    component.load();
+                } catch (Exception e) {
+                    logger.log(Level.ERROR, e::getMessage, e);
+                }
+            }
+        }
 	}
 
 	public void save() {
 		final Component[] widgets = getComponents();
-		for (int i = 0; i < widgets.length; i++) {
-			WidgetPanel component = (WidgetPanel) widgets[i];
-			component.save();
-		}
+        for (Component widget : widgets) {
+            WidgetPanel component = (WidgetPanel) widget;
+            component.save();
+        }
 	}
 
-	public final static String[] enumerate(Parameter parameter, String prefix) {
+	public static String[] enumerate(Parameter parameter, String prefix) {
 		final OffIntType type = (OffIntType) parameter.getType();
 		final Range range = type.getRange();
-		final String[] values = new String[range.getHigh() - range.getLow() + 1];
+		final String[] values = new String[range.high() - range.low() + 1];
 		for (int i = 0; i < values.length; i++) {
 			values[i] = i == 0 ? "Off" : prefix + i;
 		}

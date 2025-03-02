@@ -25,7 +25,7 @@ public final class Layer extends BaseElement {
 
 	public final static Parameter[] PARAMETERS = { SAMPLE_NAME, LEVEL, TUNING, PLAY_MODE, RANGE };
 
-	protected Layer(final Pad parent, int layerIndex) {
+	Layer(final Pad parent, int layerIndex) {
 		super(parent, 0, layerIndex, SAMPLE_LENGTH);
 		Program.assertIn(0, layerIndex, 3, "sample layer");
 	}

@@ -5,15 +5,15 @@
     <artifactId>mpcmaid</artifactId>
     <version>1.0-RC1</version>
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <distributionManagement>
         <repository>
         <id>github</id>
         <name>GitHub Packages</name>
-        <url>https://maven.pkg.github.com/malkav30/mpcmai</url>
+        <url>https://maven.pkg.github.com/malkav30/mpcmaid</url>
         </repository>
     </distributionManagement>
     <dependencies>

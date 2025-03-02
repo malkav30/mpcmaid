@@ -1,4 +1,4 @@
-/**
+ /**
 * @See http://www.davidgrant.ca/drag_drop_from_linux_kde_gnome_file_managers_konqueror_nautilus_to_java_applications
 *
 * @See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4899516
@@ -21,7 +21,7 @@ public class FileAndTextTransferHandler extends TransferHandler {
     try {
       uriListFlavor = new DataFlavor(URI_LIST_MIME_TYPE);
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      logger.log(Level.ERROR, e, e::getMessage);
     }
   }
  
@@ -33,7 +33,7 @@ public class FileAndTextTransferHandler extends TransferHandler {
     try {
       uriListFlavor = new DataFlavor(URI_LIST_MIME_TYPE);
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      logger.log(Level.ERROR, e, e::getMessage);
     }
  
     this.user = u;
@@ -71,14 +71,14 @@ public class FileAndTextTransferHandler extends TransferHandler {
  
         String str = ((String) t.getTransferData(stringFlavor));
  
-        System.out.println(str);
+        logger.log(Level.INFO, str);
  
         return true;
       }
     } catch (UnsupportedFlavorException ufe) {
-      System.out.println("importData: unsupported data flavor");
+      logger.log(Level.ERROR, "importData: unsupported data flavor", ufe);
     } catch (IOException ieo) {
-      System.out.println("importData: I/O exception");
+      logger.log(Level.ERROR, "importData: I/O exception", ieo);
     }
     return false;
   }
@@ -140,9 +140,9 @@ public class FileAndTextTransferHandler extends TransferHandler {
         File file = new File(uri);
         list.add(file);
       } catch (URISyntaxException e) {
-        e.printStackTrace();
+        logger.log(Level.ERROR, e, e::getMessage);
       } catch (IllegalArgumentException e) {
-        e.printStackTrace();
+        logger.log(Level.ERROR, e, e::getMessage);
       }
     }
     return list;

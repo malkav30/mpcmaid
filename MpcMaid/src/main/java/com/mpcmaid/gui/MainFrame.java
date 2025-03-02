@@ -6,19 +6,18 @@ import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
+import java.util.Objects;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -37,8 +36,6 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import com.centerkey.utils.BareBonesBrowserLaunch;
 import com.mpcmaid.pgm.Profile;
@@ -52,7 +49,10 @@ import com.mpcmaid.pgm.Program;
 @SuppressWarnings("unused")
 public final class MainFrame extends BaseFrame {
 
-	private static final long serialVersionUID = 8514219423131647433L;
+	private static final Logger logger = System.getLogger(MainFrame.class.getName());
+
+	@Serial
+    private static final long serialVersionUID = 8514219423131647433L;
 
 	private static final int FRAME_WIDTH = 900;
 
@@ -68,15 +68,15 @@ public final class MainFrame extends BaseFrame {
 
 	private static final Font MEDIUM_FONT = new Font("Verdana", Font.PLAIN, 10);
 
-	protected int selectedPad = 0;
+	private final int selectedPad = 0;
 
 	private final Program program;
 
 	private File pgmFile;
 
-	protected ProgramPanel programEditor;
+	private ProgramPanel programEditor;
 
-	protected JPanel audioEditor;
+	private JPanel audioEditor;
 
 	public MainFrame() {
 		this(untitledProgram());
@@ -118,10 +118,9 @@ public final class MainFrame extends BaseFrame {
 		return program;
 	}
 
-	private final static Program untitledProgram() {
+	private static Program untitledProgram() {
 		final InputStream resourceStream = Program.class.getResourceAsStream(UNTITLED_TEMPLATE);
-		final Program untitled = Program.open(resourceStream);
-		return untitled;
+        return Program.open(resourceStream);
 	}
 
 	protected void addMenus(JMenuBar mainMenuBar) {
@@ -130,48 +129,22 @@ public final class MainFrame extends BaseFrame {
 		final JMenuItem removeSamples = new JMenuItem("Remove all samples");
 		editMenu.add(removeSamples);
 
-		removeSamples.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				programEditor.removeAllSamples();
-			}
-
-		});
+		removeSamples.addActionListener(e -> programEditor.removeAllSamples());
 
 		final JMenuItem setChromatic = new JMenuItem("Set Chromatic Note Layout");
 		editMenu.add(setChromatic);
 
-		setChromatic.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				programEditor.setChromatic();
-			}
-
-		});
+		setChromatic.addActionListener(e -> programEditor.setChromatic());
 
 		final JMenuItem batchCreate = new JMenuItem("Batch Create Programs");
 		editMenu.add(batchCreate);
 
-		batchCreate.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				batchCreate();
-
-			}
-
-		});
+		batchCreate.addActionListener(e -> batchCreate());
 
 		final JMenuItem copyPadSettings = new JMenuItem("Copy Settings to All Pads");
 		editMenu.add(copyPadSettings);
 
-		copyPadSettings.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				copySettingsToAllPads();
-
-			}
-
-		});
+		copyPadSettings.addActionListener(e -> copySettingsToAllPads());
 
 	}
 
@@ -185,25 +158,11 @@ public final class MainFrame extends BaseFrame {
 	}
 
 	public void open() {
-		final FileDialog openDialog = new FileDialog(this);
-		openDialog.setDirectory(Preferences.getInstance().getOpenPath());
-		openDialog.setMode(FileDialog.LOAD);
-		openDialog.setFilenameFilter(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				String[] supportedFiles = { "PGM", "pgm" };
-				for (int i = 0; i < supportedFiles.length; i++) {
-					if (name.endsWith(supportedFiles[i])) {
-						return true;
-					}
-				}
-				return false;
-			}
-		});
-		openDialog.setVisible(true);
+		final FileDialog openDialog = getDialog(Preferences.getInstance().getOpenPath(), FileDialog.LOAD);
 		Preferences.getInstance().setOpenPath(openDialog.getDirectory());
 		if (openDialog.getDirectory() != null && openDialog.getFile() != null) {
 			String filePath = openDialog.getDirectory() + openDialog.getFile();
-			System.out.println(filePath);
+			logger.log(Level.INFO, filePath);
 			final File pgmFile = new File(filePath);
 			final MainFrame newFrame = new MainFrame(pgmFile);
 			newFrame.setVisible(true);
@@ -219,21 +178,7 @@ public final class MainFrame extends BaseFrame {
 	}
 
 	public void saveAs() {
-		final FileDialog saveDialog = new FileDialog(this);
-		saveDialog.setDirectory(Preferences.getInstance().getSavePath());
-		saveDialog.setMode(FileDialog.SAVE);
-		saveDialog.setFilenameFilter(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				String[] supportedFiles = { "PGM", "pgm" };
-				for (int i = 0; i < supportedFiles.length; i++) {
-					if (name.endsWith(supportedFiles[i])) {
-						return true;
-					}
-				}
-				return false;
-			}
-		});
-		saveDialog.setVisible(true);
+		final FileDialog saveDialog = getDialog(Preferences.getInstance().getSavePath(), FileDialog.SAVE);
 		Preferences.getInstance().setSavePath(saveDialog.getDirectory());
 		String filename = saveDialog.getFile();
 		if (saveDialog.getDirectory() != null && filename != null) {
@@ -241,11 +186,28 @@ public final class MainFrame extends BaseFrame {
 				filename += ".PGM";
 			}
 			String filePath = saveDialog.getDirectory() + filename;
-			System.out.println(filePath);
+			logger.log(Level.INFO, filePath);
 			final File file = new File(filePath);
 			setPgmFile(file);
 			program.save(pgmFile);
 		}
+	}
+
+	private FileDialog getDialog(String SavePath, int save) {
+		final FileDialog saveDialog = new FileDialog(this);
+		saveDialog.setDirectory(SavePath);
+		saveDialog.setMode(save);
+		saveDialog.setFilenameFilter((dir, name) -> {
+            String[] supportedFiles = {"PGM", "pgm"};
+            for (String supportedFile : supportedFiles) {
+                if (name.endsWith(supportedFile)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+		saveDialog.setVisible(true);
+		return saveDialog;
 	}
 
 	public void export() {
@@ -262,24 +224,22 @@ public final class MainFrame extends BaseFrame {
 			return;
 		}
 		if (!dir.exists()) {
-			dir.mkdir();
+			dir.mkdir(); //FIXME
 		}
 
 		Preferences.getInstance().setSavePath(dir.getAbsolutePath());
 
-		if (dir != null) {
-			// save PGM file to the directory with the same name
-			final File pgmExportFile = new File(dir, dir.getName() + ".PGM");
-			System.out.println(pgmExportFile);
-			setPgmFile(pgmExportFile);
-			program.save(pgmFile);
+        // save PGM file to the directory with the same name
+        final File pgmExportFile = new File(dir, dir.getName() + ".PGM");
+        logger.log(Level.INFO, pgmExportFile);
+        setPgmFile(pgmExportFile);
+        program.save(pgmFile);
 
-			// save each sample
-			programEditor.exportSamples(dir);
-		}
-	}
+        // save each sample
+        programEditor.exportSamples(dir);
+    }
 
-	protected void batchCreate() {
+	private void batchCreate() {
 		final JFileChooser batchDialog = new JFileChooser(Preferences.getInstance().getSavePath());
 		batchDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
@@ -293,27 +253,17 @@ public final class MainFrame extends BaseFrame {
 			try {
 				programEditor.batchCreate(dir);
 			} catch (Exception e) {
-				e.printStackTrace();// error occurred
+				logger.log(Level.ERROR, e::getMessage, e);// error occurred
 			}
 		}
 	}
 
-	protected void copySettingsToAllPads() {
+	private void copySettingsToAllPads() {
 		programEditor.copySettingsToAllPads();
 	}
 
-	public boolean quit() {
-		return super.quit();
-	}
-
-	protected void checkOnClose() {
-	}
-
-	public void help() {
+    public void help() {
 		BareBonesBrowserLaunch.openURL(HELP_URL);
-	}
-
-	public void loadFile(String path) {
 	}
 
 	public void makeAboutDialog() {
@@ -325,7 +275,7 @@ public final class MainFrame extends BaseFrame {
 
 		try {
 			final JLabel imageLabel = new JLabel();
-			final BufferedImage currentImage = ImageIO.read(getClass().getResourceAsStream("mpcmaidlogo400_400.png"));
+			final BufferedImage currentImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("mpcmaidlogo400_400.png"))); //FIXME
 			imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			imageLabel.setVerticalAlignment(SwingConstants.CENTER);
 			imageLabel.setOpaque(true);
@@ -337,11 +287,11 @@ public final class MainFrame extends BaseFrame {
 
 			aboutBox.getContentPane().add(imageLabel, BorderLayout.NORTH);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.ERROR, e::getMessage,e);
 		}
 
 		// aboutBox.getContentPane().add(new JLabel("MPCMaid", JLabel.CENTER));
-		final JLabel notice = new JLabel("\u00A92009 Cyrille Martraire (cyrille.martraire.com)", JLabel.CENTER);
+		final JLabel notice = new JLabel("©2009 Cyrille Martraire (cyrille.martraire.com)", JLabel.CENTER);
 		// notice.setPreferredSize(new Dimension(400, 25));
 		// aboutBox.getContentPane().add(notice, BorderLayout.CENTER);
 
@@ -371,23 +321,19 @@ public final class MainFrame extends BaseFrame {
 		final JLabel profileLabel = new JLabel("<html>MPC Profile (not effective for current windows)</html>",
 				JLabel.RIGHT);
 		final JComboBox<String> profileCombo = new JComboBox<>(
-				new String[] { Profile.MPC1000.getName(), Profile.MPC500.getName() });
+				new String[] { Profile.MPC1000.name(), Profile.MPC500.name() });
 		profileCombo.setEditable(false);
 		final Preferences preferences = Preferences.getInstance();
-		final String currentProfile = preferences.getProfile().getName();
+		final String currentProfile = preferences.getProfile().name();
 		profileCombo.setSelectedItem(currentProfile);
 		profileCombo.setAlignmentX(RIGHT_ALIGNMENT);
 		panel.add(profileLabel);
 		panel.add(profileCombo);
-		profileCombo.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				final String profileName = (String) profileCombo.getSelectedItem();
-				final Profile profile = Profile.getProfile(profileName);
-				preferences.setProfile(profile);
-			}
-
-		});
+		profileCombo.addActionListener(e -> {
+            final String profileName = (String) profileCombo.getSelectedItem();
+            final Profile profile = Profile.getProfile(profileName);
+            preferences.setProfile(profile);
+        });
 
 		// audition mode
 		final JLabel auditionLabel = new JLabel(
@@ -399,14 +345,10 @@ public final class MainFrame extends BaseFrame {
 		auditionCombo.setAlignmentX(RIGHT_ALIGNMENT);
 		panel.add(auditionLabel);
 		panel.add(auditionCombo);
-		auditionCombo.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				final int audition = auditionCombo.getSelectedIndex();
-				preferences.setAuditionSamples(audition);
-			}
-
-		});
+		auditionCombo.addActionListener(e -> {
+            final int audition = auditionCombo.getSelectedIndex();
+            preferences.setAuditionSamples(audition);
+        });
 
 		// contentPane.add(new JLabel("MPC Maid Preferences", JLabel.CENTER),
 		// BorderLayout.NORTH);
@@ -443,18 +385,14 @@ public final class MainFrame extends BaseFrame {
 		audioEditor.add(waveformePanel, BorderLayout.CENTER);
 
 		final JSlider sensitivitySlider = new JSlider(JSlider.VERTICAL, 50, 200, 130);
-		sensitivitySlider.addChangeListener(new ChangeListener() {
+		sensitivitySlider.addChangeListener(e -> {
+            final JSlider source = (JSlider) e.getSource();
+            if (waveformePanel.isReady() && !source.getValueIsAdjusting()) {
+                final int sensitivity = source.getValue();
+                waveformePanel.setSensitivity(sensitivity);
+            }
 
-			public void stateChanged(ChangeEvent e) {
-				final JSlider source = (JSlider) e.getSource();
-				if (waveformePanel.isReady() && !source.getValueIsAdjusting()) {
-					final int sensitivity = source.getValue();
-					waveformePanel.setSensitivity(sensitivity);
-				}
-
-			}
-
-		});
+        });
 		audioEditor.add(sensitivitySlider, BorderLayout.EAST);
 		sensitivitySlider.setPreferredSize(new Dimension(25, 40));
 		sensitivitySlider.setPaintTicks(true);
@@ -484,27 +422,24 @@ public final class MainFrame extends BaseFrame {
 		exportZone.add(exportSlicesButton);
 		exportSlicesButton.setFocusable(false);
 		exportSlicesButton.setEnabled(false);
-		exportSlicesButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				try {
-					if (waveformePanel.isReady()) {
-						waveformePanel.export(exportPrefix.getText());
-					}
-				} catch (IOException io) {
-					JOptionPane.showMessageDialog(waveformePanel, io.getMessage(), "Error saving file",
-							JOptionPane.ERROR_MESSAGE);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-
-		});
+		exportSlicesButton.addActionListener(e -> {
+            try {
+                if (waveformePanel.isReady()) {
+                    waveformePanel.export(exportPrefix.getText());
+                }
+            } catch (IOException io) {
+                JOptionPane.showMessageDialog(waveformePanel, io.getMessage(), "Error saving file",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (Exception e1) {
+                logger.log(Level.ERROR, e1::getMessage, e1);
+            }
+        });
 
 		audioEditor.add(bottom, BorderLayout.SOUTH);
 		waveformePanel.setTransferHandler(new FileDragHandler() {
 
-			private static final long serialVersionUID = -4822099780010064290L;
+			@Serial
+            private static final long serialVersionUID = -4822099780010064290L;
 
 			protected void process(File file) {
 				try {
@@ -521,7 +456,7 @@ public final class MainFrame extends BaseFrame {
 					JOptionPane.showMessageDialog(waveformePanel, "The file format is not supported by the MPC",
 							"Unsupported file", JOptionPane.ERROR_MESSAGE);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.log(Level.ERROR, e::getMessage, e);
 				}
 			}
 
@@ -579,7 +514,7 @@ public final class MainFrame extends BaseFrame {
 						try {
 							waveformePanel.getSelectedSlice().play();
 						} catch (Throwable e) {
-							e.printStackTrace();
+							logger.log(Level.ERROR, e::getMessage, e);
 						}
 						break;
 					}
@@ -619,23 +554,20 @@ public final class MainFrame extends BaseFrame {
 
 		});
 		// NUDGE WITH MOUSE WHEEL
-		waveformePanel.addMouseWheelListener(new MouseWheelListener() {
-
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (!waveformePanel.isReady()) {
-					return;
-				}
-				waveformePanel.nudgeMarker(-100 * e.getWheelRotation());
-				final int location = waveformePanel.getSelectedMarkerLocation();
-				currentMarkerLocation.setText("Marker location: " + location + " samples");
-			}
-
-		});
+		waveformePanel.addMouseWheelListener(e -> {
+            if (!waveformePanel.isReady()) {
+                return;
+            }
+            waveformePanel.nudgeMarker(-100 * e.getWheelRotation());
+            final int location = waveformePanel.getSelectedMarkerLocation();
+            currentMarkerLocation.setText("Marker location: " + location + " samples");
+        });
 
 		// SUPPORT DROP PGM FILES
 		main.setTransferHandler(new FileDragHandler() {
 
-			private static final long serialVersionUID = 712227010818715230L;
+			@Serial
+            private static final long serialVersionUID = 712227010818715230L;
 
 			protected void process(File file) {
 				final MainFrame newFrame = new MainFrame(file);

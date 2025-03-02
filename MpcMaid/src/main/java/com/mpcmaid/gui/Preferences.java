@@ -1,11 +1,12 @@
 package com.mpcmaid.gui;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.Properties;
-
 import com.mpcmaid.pgm.Profile;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.util.Properties;
+import java.lang.System.Logger.Level;
+import java.lang.System.Logger;
 
 /**
  * Application-scope settings
@@ -16,11 +17,13 @@ import com.mpcmaid.pgm.Profile;
  */
 public final class Preferences {
 
+	private static final Logger logger = System.getLogger(Preferences.class.getName());
+
 	private static final String MPCMAID_SETTINGS_DIR = "mpcmaid";
 
 	private final static Preferences INSTANCE = new Preferences();
 
-	public final static Preferences getInstance() {
+	public static Preferences getInstance() {
 		return INSTANCE;
 	}
 
@@ -77,7 +80,7 @@ public final class Preferences {
 		save();
 	}
 
-	public static final boolean isMacOsX() {
+	public static boolean isMacOsX() {
 		return System.getProperty("mrj.version") != null;
 	}
 
@@ -88,59 +91,59 @@ public final class Preferences {
 		return new File(System.getProperty("user.home"));
 	}
 
-	private final static File getSettingsDirectory() {
+	private static File getSettingsDirectory() {
 		final File home = getUserPreferencesDirectory();
 		final File settingsDirectory = new File(home, MPCMAID_SETTINGS_DIR);
 		if (!settingsDirectory.exists()) {
 			if (!settingsDirectory.mkdir()) {
-				throw new IllegalStateException("Could not create settings directory!\n" + settingsDirectory.toString());
+				throw new IllegalStateException("Could not create settings directory: " + settingsDirectory);
 			}
 		}
 		return settingsDirectory;
 	}
 
-	private final static Properties getProperties() {
+	private static Properties getProperties() {
 		Properties properties = new Properties();
 		final File home = getSettingsDirectory();
 		final File file = new File(home, "mpcmaid.properties");
 		try {
 			file.createNewFile();
-			properties.load(new FileInputStream(file));
+			properties.load(Files.newInputStream(file.toPath()));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.ERROR, e::getMessage, e); //FIXME
 			return null;
 		}
 		return properties;
 	}
 
-	public final void load() {
+	public void load() {
 		final Properties properties = getProperties();
 		if (properties == null) {
 			return;
 		}
 		final String home = System.getProperty("user.home");
-		this.profile = Profile.getProfile(properties.getProperty("profile", Profile.MPC1000.getName()));
+		this.profile = Profile.getProfile(properties.getProperty("profile", Profile.MPC1000.name()));
 		this.openPath = properties.getProperty("lastOpenPath", home);
 		this.savePath = properties.getProperty("lastSavePath", home);
 		this.auditionSamples = Integer.parseInt(properties.getProperty("auditionSamples", "1"));
 	}
 
-	public final void save() {
+	public void save() {
 		try {
 			final Properties properties = getProperties();
 			if (properties == null) {
 				return;
 			}
-			properties.setProperty("profile", profile.getName());
+			properties.setProperty("profile", profile.name());
 			properties.setProperty("lastOpenPath", openPath);
 			properties.setProperty("lastSavePath", savePath);
 			properties.setProperty("auditionSamples", String.valueOf(auditionSamples));
 
 			final File home = getSettingsDirectory();
 			final File file = new File(home, "mpcmaid.properties");
-			properties.store(new FileOutputStream(file), null);
-		} catch (Exception ignore) {
-			ignore.printStackTrace();
+			properties.store(Files.newOutputStream(file.toPath()), null);
+		} catch (Exception e) {
+			logger.log(Level.ERROR, e::getMessage, e);
 		}
 	}
 }

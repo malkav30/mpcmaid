@@ -20,7 +20,7 @@ public class Slicer {
 	private final Sample sample;
 
 	// cache
-	private int[][] channels;
+	private final int[][] channels;
 
 	private int sensitivity = 130;
 
@@ -48,18 +48,18 @@ public class Slicer {
 	 * compare the energy of each window against the average local energy on a
 	 * number of neighbor windows; when this comparison is greater enough, we
 	 * got a beat.
-	 * 
+	 * <p>
 	 * To reduce the number of fake beats, we also use a toggle state so that no
 	 * beat can be found immediately after a beat already found.
-	 * 
+	 * <p>
 	 * When a beat has been found, its exact location is then adjusted to the
 	 * nearest zero-crossing location in the past.
-	 * 
+	 * <p>
 	 * For each beat found, a corresponding marker is added to the list of
 	 * markers.
 	 */
 	public void extractMarkers(final int[][] channels) {
-		markers.clear(getFrameLength(), (int) sample.getFormat().getFrameRate());
+		markers.clear(getFrameLength(), (int) sample.format().getFrameRate());
 
 		final int step = windowSize / overlapRatio;
 
@@ -97,12 +97,11 @@ public class Slicer {
 	private long localEnergy(int i, long[] energyHistory) {
 		final int n = energyHistory.length;
 		final int m = localEnergyWindowSize;
-		int from = 0;
+		int from;
 		int to = m;
 		if (i < m) {
 			from = 0;
-			to = m;
-		} else if (i + m < n) {
+        } else if (i + m < n) {
 			from = i;
 			to = i + m;
 		} else {
@@ -111,7 +110,7 @@ public class Slicer {
 		}
 		long sum = 0;
 		for (int j = from; j < to; j++) {
-			sum += Math.pow(energyHistory[j], 1);
+			sum += (long) Math.pow(energyHistory[j], 1);
 		}
 		return sum / m;
 	}
@@ -133,27 +132,27 @@ public class Slicer {
 			long sum = 0;
 			// for the window size, cumulate energy
 			for (int j = 0; j < windowSize; j++) {
-				sum += Math.pow(samplesL[i + j], 2);
-				sum += Math.pow(samplesR[i + j], 2);
+				sum += (long) Math.pow(samplesL[i + j], 2);
+				sum += (long) Math.pow(samplesR[i + j], 2);
 			}
 			energy[windowIndex++] = sum;
 		}
 		return energy;
 	}
 
-	private final static int nearestZeroCrossing(final int[] samples, final int index, final int excursion) {
+	private static int nearestZeroCrossing(final int[] samples, final int index, final int excursion) {
 		if (index == 0) {
 			return 0;
 		}
 		int i = index;
-		final int min = index - excursion >= 0 ? index - excursion : 0;
+		final int min = Math.max(index - excursion, 0);
 		while (!isZeroCross(samples, i) && i > min) {
 			i--;
 		}
 		return i;
 	}
 
-	private final static boolean isZeroCross(final int[] samples, final int index) {
+	private static boolean isZeroCross(final int[] samples, final int index) {
 		if (index == 0) {
 			return true;
 		}
@@ -174,7 +173,7 @@ public class Slicer {
 	}
 
 	public int getFrameLength() {
-		return sample.getFrameLength();
+		return sample.frameLength();
 	}
 
 	public void setSensitivity(final int sensitivity) {
@@ -188,8 +187,7 @@ public class Slicer {
 
 	public int adjustNearestZeroCrossing(int location, final int excursion) {
 		final int[] samplesL = channels[0];
-		final int adjustedZc = nearestZeroCrossing(samplesL, location, excursion);
-		return adjustedZc;
+        return nearestZeroCrossing(samplesL, location, excursion);
 	}
 
 	// ------------------------------
@@ -205,7 +203,7 @@ public class Slicer {
 
 	public Sample getSlice(final int markerIndex) {
 		final LocationRange range = markers.getRangeFrom(markerIndex);
-		return sample.subRegion(range.getFrom(), range.getTo());
+		return sample.subRegion(range.from(), range.to());
 	}
 
 	/**

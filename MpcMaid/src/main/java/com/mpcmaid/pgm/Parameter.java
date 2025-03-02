@@ -8,7 +8,7 @@ package com.mpcmaid.pgm;
  */
 public class Parameter {
 
-	public static interface Type {
+	public interface Type {
 
 		Object get(BaseElement element, Parameter parameter);
 
@@ -21,19 +21,17 @@ public class Parameter {
 
 	public static final class TextType implements Type {
 
-		public int getStringLength() {
-			return 16;
-		}
+		public static final int STRING_LENGTH = 16;
 
 		public void validate(String string, String explanation) {
-			if (validate(string)) {
+			if (!validate(string)) {
 				throw new IllegalArgumentException(explanation + ": " + string + " is too long (16 chars max)");
 			}
 		}
 
 		public boolean validate(Object o) {
 			final String string = (String) o;
-			return string.length() > 16;
+			return string.length() <= STRING_LENGTH;
 		}
 
 		public Object get(BaseElement element, Parameter parameter) {
@@ -80,18 +78,18 @@ public class Parameter {
 
 		public Object get(BaseElement element, Parameter parameter) {
 			final byte b = element.getBuffer().getByte(parameter.getOffset());
-			return Integer.valueOf(b);
+			return (int) b;
 		}
 
 		public void set(BaseElement element, Parameter parameter, Object value) {
 			final Integer i = (Integer) value;
-			final int val = i.intValue();
+			final int val = i;
 			validate(i, parameter.getLabel());
 			element.getBuffer().setByte(parameter.getOffset(), val);
 		}
 
 		public String toolTip() {
-			return "Min = " + getRange().getLow() + ", max = " + getRange().getHigh();
+			return "Min = " + getRange().low() + ", max = " + getRange().high();
 		}
 
 		public String toString() {
@@ -101,7 +99,7 @@ public class Parameter {
 
 	public static final class IntType extends NumberType {
 
-		protected IntType(Range range) {
+		private IntType(Range range) {
 			super(range);
 		}
 
@@ -109,7 +107,7 @@ public class Parameter {
 
 	public static final class OffIntType extends NumberType {
 
-		protected OffIntType(Range range) {
+		private OffIntType(Range range) {
 			super(range);
 		}
 
@@ -117,7 +115,7 @@ public class Parameter {
 
 	public static final class TuningType extends NumberType {
 
-		protected TuningType(Range range) {
+		private TuningType(Range range) {
 			super(range);
 		}
 
@@ -130,7 +128,7 @@ public class Parameter {
 
 	public static final class RangeType extends NumberType {
 
-		protected RangeType(Range range) {
+		private RangeType(Range range) {
 			super(range);
 		}
 
@@ -149,7 +147,7 @@ public class Parameter {
 
 		private final String[] values;
 
-		protected EnumType(String[] values) {
+		private EnumType(String[] values) {
 			this.values = values;
 		}
 
@@ -159,12 +157,12 @@ public class Parameter {
 
 		public Object get(BaseElement element, Parameter parameter) {
 			final byte b = element.getBuffer().getByte(parameter.getOffset());
-			return Integer.valueOf(b);
+			return (int) b;
 		}
 
 		public void set(BaseElement element, Parameter parameter, Object value) {
 			final Integer i = (Integer) value;
-			final int val = i.intValue();
+			final int val = i;
 			validate(i, parameter.getLabel());
 			element.getBuffer().setByte(parameter.getOffset(), val);
 		}
@@ -177,8 +175,7 @@ public class Parameter {
 		}
 
 		public boolean validate(Object o) {
-			final Integer v = (Integer) o;
-			final int value = v.intValue();
+            final int value = (Integer) o;
 			return value >= 0 && value < values.length;
 		}
 
@@ -199,35 +196,35 @@ public class Parameter {
 		this.type = type;
 	}
 
-	public static final Parameter range(final String label, final int index, final Range valueRange) {
+	public static Parameter range(final String label, final int index, final Range valueRange) {
 		return new Parameter(label, index, new RangeType(valueRange));
 	}
 
-	public static final Parameter range(final String label, final int index, final int min, final int max) {
+	public static Parameter range(final String label, final int index, final int min, final int max) {
 		return range(label, index, new Range(min, max));
 	}
 
-	public static final Parameter integer(final String label, final int index, final Range valueRange) {
+	public static Parameter integer(final String label, final int index, final Range valueRange) {
 		return new Parameter(label, index, new IntType(valueRange));
 	}
 
-	public static final Parameter integer(final String label, final int index, final int min, final int max) {
+	public static Parameter integer(final String label, final int index, final int min, final int max) {
 		return integer(label, index, new Range(min, max));
 	}
 
-	public static final Parameter intOrOff(final String label, final int index, final int min, final int max) {
+	public static Parameter intOrOff(final String label, final int index, final int min, final int max) {
 		return new Parameter(label, index, new OffIntType(new Range(min, max)));
 	}
 
-	public static final Parameter decimal(final String label, final int index, final Range valueRange) {
+	public static Parameter decimal(final String label, final int index, final Range valueRange) {
 		return new Parameter(label, index, new TuningType(valueRange));
 	}
 
-	public static final Parameter string(final String label, final int index, final int stringLength) {
+	public static Parameter string(final String label, final int index, final int stringLength) {
 		return new Parameter(label, index, new TextType());
 	}
 
-	public static final Parameter enumType(final String label, final int index, final String[] possibleValues) {
+	public static Parameter enumType(final String label, final int index, final String[] possibleValues) {
 		return new Parameter(label, index, new EnumType(possibleValues));
 	}
 

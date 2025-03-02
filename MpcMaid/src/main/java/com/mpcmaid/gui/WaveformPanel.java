@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 import java.io.File;
+import java.io.Serial;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,7 +26,8 @@ import com.mpcmaid.pgm.Program;
  */
 public class WaveformPanel extends JPanel {
 
-	private static final long serialVersionUID = -1728002082575891020L;
+	@Serial
+    private static final long serialVersionUID = -1728002082575891020L;
 
 	private static final int AVERAGE_ENERGY_WINDOW = 43;
 
@@ -97,7 +99,7 @@ public class WaveformPanel extends JPanel {
 	}
 
 	private void printWaveform(int[] values, final int channel, Graphics g) {
-		final int width = (int) (getWidth() - 50);
+		final int width = getWidth() - 50;
 		final int fullHeight = 180;
 		final int height = fullHeight * 4 / 5;
 
@@ -124,7 +126,7 @@ public class WaveformPanel extends JPanel {
 		int oldX = x0;
 		int oldY = y0;
 		g.setColor(Color.GRAY);
-		final int increment = (int) (n / (4 * width));
+		final int increment = n / (4 * width);
 		for (int t = 0; t < n; t += increment) {
 			final int x = x0 + (int) Math.round(t * xScale);
 			final int y = y0 + (int) Math.round(values[t] * yScale);
@@ -168,7 +170,7 @@ public class WaveformPanel extends JPanel {
 
 	public void selectClosestMarker(final int mouseX) {
 		// get the location (in samples) from the mouse position
-		final int width = (int) (getWidth() - 50);
+		final int width = getWidth() - 50;
 		final int x0 = 20;
 		final double minX = 0;
 		final double maxX = slicer.getChannels()[0].length;
@@ -239,7 +241,7 @@ public class WaveformPanel extends JPanel {
 		return markers.getDuration();
 	}
 
-	public static final String shortName(String name) {
+	public static String shortName(String name) {
 		final int indexOf = name.lastIndexOf('.');
 		if (indexOf != -1) {
 			return name.substring(0, indexOf);
@@ -247,7 +249,7 @@ public class WaveformPanel extends JPanel {
 		return name;
 	}
 
-	public static final String prefixProposal(String name, final int maxLen) {
+	public static String prefixProposal(String name, final int maxLen) {
 		final int indexOf = name.indexOf('.');
 		String prefix = name;
 		if (indexOf != -1) {

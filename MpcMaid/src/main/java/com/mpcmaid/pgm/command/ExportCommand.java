@@ -1,12 +1,13 @@
 package com.mpcmaid.pgm.command;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-
 import com.mpcmaid.pgm.Sample;
 import com.mpcmaid.pgm.SampleCommand;
 import com.mpcmaid.pgm.SampleMatrix;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.System.Logger.Level;
+import java.lang.System.Logger;
 
 /**
  * Exports every sample file into the destination directory.
@@ -14,6 +15,9 @@ import com.mpcmaid.pgm.SampleMatrix;
  * @author cyrille martraire
  */
 public final class ExportCommand implements SampleCommand {
+
+	private static final Logger logger = System.getLogger(ExportCommand.class.getName());
+
 	private final File dir;
 
 	private int exported = 0;
@@ -25,17 +29,15 @@ public final class ExportCommand implements SampleCommand {
 	}
 
 	public Object execute(SampleMatrix matrix) {
-		final Iterator<Sample> it = matrix.collectAll().iterator();
-		while (it.hasNext()) {
-			Sample sample = it.next();
-			expected++;
-			try {
-				sample.convertTo(dir);
-				exported++;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+        for (Sample sample : matrix.collectAll()) {
+            expected++;
+            try {
+                sample.convertTo(dir);
+                exported++;
+            } catch (IOException e) {
+                logger.log(Level.ERROR, e::getMessage, e);
+            }
+        }
 		return getReport();
 	}
 

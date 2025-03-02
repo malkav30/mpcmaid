@@ -4,16 +4,18 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import static org.junit.Assert.assertNotEquals;
+
 public class SampleTest extends TestCase {
 
-	public void test_importFile_invalidExtension() throws Exception {
+	public void test_importFile_invalidExtension() {
 		// not a wave file!
 		File invalidFile = new File("test.pgm");
 		Sample sample = Sample.importFile(invalidFile, 16, Sample.RENAMED, true, 0);
 		assertNull(sample);
 	}
 
-	public void test_importFile_ok() throws Exception {
+	public void test_importFile_ok() {
 		final File dir = new File("dummydir");
 
 		// valid file
@@ -32,7 +34,7 @@ public class SampleTest extends TestCase {
 		assertFalse(sample.getSampleName().endsWith(".wav"));
 	}
 
-	public void test_importFile_fileTooLong() throws Exception {
+	public void test_importFile_fileTooLong() {
 		final File dir = new File("dummydir");
 
 		// valid file, name too long before the extension + RENAME policy
@@ -42,8 +44,8 @@ public class SampleTest extends TestCase {
 		assertEquals(fileTooLong, sample.getActualFile());
 		assertEquals(dir, sample.getDestinationFile(dir).getParentFile());
 
-		assertFalse(sample.getName().equals(sample.getOriginalName()));
-		assertFalse(sample.getOriginalName().equals(sample.getSampleName()));
+        assertNotEquals(sample.getName(), sample.getOriginalName());
+        assertNotEquals(sample.getOriginalName(), sample.getSampleName());
 
 		assertTrue(sample.isRenamed());
 
@@ -55,7 +57,7 @@ public class SampleTest extends TestCase {
 		assertTrue(sample.getSampleName().endsWith("12"));
 	}
 
-	public void test_findFile_notFound() throws Exception {
+	public void test_findFile_notFound() {
 		final File path = getPath();
 
 		final File dir = new File("dummydir");
@@ -77,11 +79,10 @@ public class SampleTest extends TestCase {
 
 	private File getPath() {
 		final File file = new File(getClass().getResource("chh.wav").getFile());
-		final File path = file.getParentFile();
-		return path;
+        return file.getParentFile();
 	}
 
-	public void test_findFile_ok() throws Exception {
+	public void test_findFile_ok() {
 		final File path = getPath();
 		final File dir = new File("dummydir");
 		final File file = new File(getClass().getResource("chh.wav").getFile());
