@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.mpcmaid.pgm.Layer;
 import com.mpcmaid.pgm.Pad;
@@ -17,6 +19,8 @@ import com.mpcmaid.pgm.SampleMatrix;
  * @author cyrille martraire
  */
 public class ProgramSamples extends SampleMatrix {
+
+	private static final Logger logger = Logger.getLogger(ProgramSamples.class.getName());
 
 	private File path;
 
@@ -106,7 +110,7 @@ public class ProgramSamples extends SampleMatrix {
 			}
 			sample.play();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 	}
 

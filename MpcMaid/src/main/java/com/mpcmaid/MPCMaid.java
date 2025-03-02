@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
 import java.net.URL;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -24,6 +26,8 @@ public final class MPCMaid {
 
 	// splash screen
 	private static JWindow screen = null;
+
+	private final static Logger logger = Logger.getLogger(MPCMaid.class.getName());
 
 	public static void showSplash() {
 		screen = new JWindow();
@@ -89,8 +93,8 @@ public final class MPCMaid {
                 try {
                     Thread.sleep(1500);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                    logger.log(Level.SEVERE, e, e::getMessage);
+				}
             }
             baseFrame.setVisible(true);
             //baseFrame.show();
@@ -107,7 +111,7 @@ public final class MPCMaid {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 		try {
 			if (isMacOsX()) {
@@ -115,12 +119,12 @@ public final class MPCMaid {
 				System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MPC Maid");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 		try {
 			Preferences.getInstance().load();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 	}
 

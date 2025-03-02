@@ -62,6 +62,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -74,6 +76,7 @@ import javax.swing.KeyStroke;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter;
 
+import com.mpcmaid.MPCMaid;
 import com.mpcmaid.audio.SamplePlayer;
 
 /**
@@ -83,6 +86,8 @@ import com.mpcmaid.audio.SamplePlayer;
  * @author cyrille martraire
  */
 public class BaseFrame extends JFrame implements ActionListener {
+
+	private static final Logger logger = Logger.getLogger(BaseFrame.class.getName());
 
 	private static final long serialVersionUID = -8081595568054819394L;
 
@@ -255,7 +260,7 @@ public class BaseFrame extends JFrame implements ActionListener {
 				OSXAdapter.setFileHandler(this, getClass().getDeclaredMethod("loadFile", String.class));
 			} catch (Exception e) {
 				System.err.println("Error while loading the OSXAdapter:");
-				e.printStackTrace();
+				logger.log(Level.SEVERE, e, e::getMessage);
 			}
 		}
 	}

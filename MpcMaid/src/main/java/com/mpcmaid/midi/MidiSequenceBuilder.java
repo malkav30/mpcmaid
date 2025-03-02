@@ -1,7 +1,11 @@
 package com.mpcmaid.midi;
 
+import com.mpcmaid.gui.BaseFrame;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiEvent;
@@ -17,13 +21,15 @@ import javax.sound.midi.Track;
  */
 public final class MidiSequenceBuilder {
 
+	private static final Logger logger = Logger.getLogger(MidiSequenceBuilder.class.getName());
+
 	private Sequence sequence;
 
 	public MidiSequenceBuilder(final int ppq) {
 		try {
 			sequence = new Sequence(Sequence.PPQ, ppq);
 		} catch (InvalidMidiDataException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 	}
 
@@ -52,7 +58,7 @@ public final class MidiSequenceBuilder {
 			track.add(new MidiEvent(on, startTick));
 			track.add(new MidiEvent(off, startTick + tickLength));
 		} catch (InvalidMidiDataException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 	}
 

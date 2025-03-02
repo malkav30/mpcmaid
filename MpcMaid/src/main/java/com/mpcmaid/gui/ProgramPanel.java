@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -53,6 +55,8 @@ import com.mpcmaid.pgm.command.SimpleAssignCommand;
  */
 @SuppressWarnings("unused")
 public class ProgramPanel extends JPanel implements BindingCapable {
+
+	private static final Logger logger = Logger.getLogger(ProgramPanel.class.getName());
 
 	private static final long serialVersionUID = -2447341386033109052L;
 
@@ -374,7 +378,7 @@ public class ProgramPanel extends JPanel implements BindingCapable {
 			}
 			refreshImpactedPads(impactedPads);
 		} catch (Exception e) {
-			e.printStackTrace();// error occurred
+			logger.log(Level.SEVERE, e, e::getMessage);// error occurred
 		}
 	}
 

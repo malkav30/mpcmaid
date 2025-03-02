@@ -2,7 +2,10 @@ package com.mpcmaid.pgm.command;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.mpcmaid.gui.BaseFrame;
 import com.mpcmaid.pgm.Sample;
 import com.mpcmaid.pgm.SampleCommand;
 import com.mpcmaid.pgm.SampleMatrix;
@@ -13,6 +16,9 @@ import com.mpcmaid.pgm.SampleMatrix;
  * @author cyrille martraire
  */
 public final class ExportCommand implements SampleCommand {
+
+	private static final Logger logger = Logger.getLogger(ExportCommand.class.getName());
+
 	private final File dir;
 
 	private int exported = 0;
@@ -30,7 +36,7 @@ public final class ExportCommand implements SampleCommand {
                 sample.convertTo(dir);
                 exported++;
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, e, e::getMessage);
             }
         }
 		return getReport();

@@ -1,8 +1,12 @@
 package com.mpcmaid.audio;
 
+import com.mpcmaid.MPCMaid;
+
 import java.io.File;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A sample player which employs limited number of threads to play clips. Each
@@ -13,6 +17,8 @@ import java.util.concurrent.BlockingQueue;
  *
  */
 public final class SamplePlayer {
+
+	private final static Logger logger = Logger.getLogger(SamplePlayer.class.getName());
 
 	private final static SamplePlayer INSTANCE = new SamplePlayer();
 
@@ -42,7 +48,7 @@ public final class SamplePlayer {
 			if (queue.isEmpty())
 				queue.add(Sample.open(file));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 	}
 

@@ -2,6 +2,8 @@ package com.mpcmaid.gui;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,6 +25,8 @@ import com.mpcmaid.pgm.Parameter.RangeType;
  * @author cyrille martraire
  */
 public class WidgetPanel extends JPanel implements BindingCapable {
+
+	private static final Logger logger = Logger.getLogger(WidgetPanel.class.getName());
 
 	private static final long serialVersionUID = -8139985486559953248L;
 
@@ -109,7 +113,7 @@ public class WidgetPanel extends JPanel implements BindingCapable {
 					component.load();
 				} catch (Exception e) {
 					System.out.println("xception: " + component + " " + i);
-					e.printStackTrace();
+					logger.log(Level.SEVERE, e, e::getMessage);
 				}
 			}
 		}

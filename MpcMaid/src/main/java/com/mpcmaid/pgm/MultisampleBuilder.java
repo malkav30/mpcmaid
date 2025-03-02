@@ -1,9 +1,13 @@
 package com.mpcmaid.pgm;
 
+import com.mpcmaid.gui.BaseFrame;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Finds out a configuration of a multisample program from a mere set of sample
@@ -16,6 +20,8 @@ import java.util.List;
  * @author cyrille martraire
  */
 public class MultisampleBuilder {
+
+	private static final Logger logger = Logger.getLogger(MultisampleBuilder.class.getName());
 
 	private final int firstNote = 35;
 
@@ -35,7 +41,7 @@ public class MultisampleBuilder {
 		try {
 			return assignBare(samples);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 			return new Slot[64];
 		}
 	}

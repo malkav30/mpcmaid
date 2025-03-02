@@ -8,6 +8,7 @@ import javax.sound.midi.Track;
 import junit.framework.TestCase;
 
 public class SlicerTest extends TestCase {
+
 	private static final int AVERAGE_ENERGY_WINDOW = 43;
 
 	private static final int OVERLAP_RATIO = 1;
@@ -28,7 +29,7 @@ public class SlicerTest extends TestCase {
 
 	private Markers markers;
 
-	public void testMarkers() {
+	public void testMarkers() throws IOException {
 		assertEquals("Slicer: 3.8424037s (169450 samples), 9 markers", slicer.toString());
 		System.out.println(markers);
 
@@ -70,17 +71,14 @@ public class SlicerTest extends TestCase {
 		System.out.println(range7);
 
 		final int[] midiTicks = { 0, 32, 97, 129, 190, 222, 288, 320, 381, 413, 478, 510, 575, 607, 673, 705, 705 };
-		try {
-			final Sequence midiSequence = markers.exportMidiSequence(null, MIDI_PPQ);
-			final Track track = midiSequence.getTracks()[0];
-			assertEquals(17, track.size());
-			for (int i = 0; i < track.size(); i++) {
-				// System.out.println(track.get(i).getTick());
-				assertEquals(midiTicks[i], track.get(i).getTick());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		final Sequence midiSequence = markers.exportMidiSequence(null, MIDI_PPQ);
+		final Track track = midiSequence.getTracks()[0];
+		assertEquals(17, track.size());
+		for (int i = 0; i < track.size(); i++) {
+			// System.out.println(track.get(i).getTick());
+			assertEquals(midiTicks[i], track.get(i).getTick());
 		}
+
 		assertEquals(3, markers.getSelectedMarkerIndex());
 		markers.insertMarker();
 		assertEquals(4, markers.getSelectedMarkerIndex());

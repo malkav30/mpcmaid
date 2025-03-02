@@ -14,6 +14,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -44,6 +46,8 @@ import com.mpcmaid.pgm.Program;
  */
 @SuppressWarnings("unused")
 public final class MainFrame extends BaseFrame {
+
+	private static final Logger logger = Logger.getLogger(MainFrame.class.getName());
 
 	private static final long serialVersionUID = 8514219423131647433L;
 
@@ -246,7 +250,7 @@ public final class MainFrame extends BaseFrame {
 			try {
 				programEditor.batchCreate(dir);
 			} catch (Exception e) {
-				e.printStackTrace();// error occurred
+				logger.log(Level.SEVERE, e, e::getMessage);// error occurred
 			}
 		}
 	}
@@ -287,7 +291,7 @@ public final class MainFrame extends BaseFrame {
 
 			aboutBox.getContentPane().add(imageLabel, BorderLayout.NORTH);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 
 		// aboutBox.getContentPane().add(new JLabel("MPCMaid", JLabel.CENTER));
@@ -455,7 +459,7 @@ public final class MainFrame extends BaseFrame {
 					JOptionPane.showMessageDialog(waveformePanel, "The file format is not supported by the MPC",
 							"Unsupported file", JOptionPane.ERROR_MESSAGE);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.log(Level.SEVERE, e, e::getMessage);
 				}
 			}
 
@@ -513,7 +517,7 @@ public final class MainFrame extends BaseFrame {
 						try {
 							waveformePanel.getSelectedSlice().play();
 						} catch (Throwable e) {
-							e.printStackTrace();
+							logger.log(Level.SEVERE, e, e::getMessage);
 						}
 						break;
 					}

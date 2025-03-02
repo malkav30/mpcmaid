@@ -4,6 +4,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
@@ -17,6 +19,8 @@ import javax.swing.TransferHandler;
 @SuppressWarnings("unchecked")
 public class FileDragHandler extends TransferHandler {
 
+	private static final Logger logger = Logger.getLogger(FileDragHandler.class.getName());
+
 	private static final long serialVersionUID = 2989210654686012401L;
 
 	public boolean importData(JComponent c, Transferable data) {
@@ -27,7 +31,7 @@ public class FileDragHandler extends TransferHandler {
 			final List<File> files = (List<File>) data.getTransferData(DataFlavor.javaFileListFlavor);
 			process(files);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 
 		return true;

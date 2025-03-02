@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.mpcmaid.pgm.Profile;
 
@@ -16,6 +18,8 @@ import com.mpcmaid.pgm.Profile;
  * @author cyrille martraire
  */
 public final class Preferences {
+
+	private static final Logger logger = Logger.getLogger(Preferences.class.getName());
 
 	private static final String MPCMAID_SETTINGS_DIR = "mpcmaid";
 
@@ -108,7 +112,7 @@ public final class Preferences {
 			file.createNewFile();
 			properties.load(Files.newInputStream(file.toPath()));
 		} catch (Exception e) {
-			e.printStackTrace(); //FIXME
+			logger.log(Level.SEVERE, e, e::getMessage); //FIXME
 			return null;
 		}
 		return properties;
@@ -141,7 +145,7 @@ public final class Preferences {
 			final File file = new File(home, "mpcmaid.properties");
 			properties.store(Files.newOutputStream(file.toPath()), null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e, e::getMessage);
 		}
 	}
 }

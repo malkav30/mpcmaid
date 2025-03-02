@@ -37,9 +37,9 @@ public class TestDragDropLinux extends JList implements DropTargetListener {
         File file = new File(uri);
         list.add(file);
       } catch (URISyntaxException e) {
-        e.printStackTrace();
+        logger.log(Level.SEVERE, e, e::getMessage);
       } catch (IllegalArgumentException e) {
-        e.printStackTrace();
+        logger.log(Level.SEVERE, e, e::getMessage);
       }
     }
     return list;
@@ -78,7 +78,7 @@ public class TestDragDropLinux extends JList implements DropTargetListener {
     try {
       uriListFlavor = new DataFlavor(URI_LIST_MIME_TYPE);
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      logger.log(Level.SEVERE, e, e::getMessage);
     }
 
     try {
@@ -98,7 +98,7 @@ public class TestDragDropLinux extends JList implements DropTargetListener {
         System.out.println(files);
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.log(Level.SEVERE, e, e::getMessage);
     }
 
     setModel(model);

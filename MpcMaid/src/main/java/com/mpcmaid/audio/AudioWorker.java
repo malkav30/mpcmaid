@@ -1,7 +1,11 @@
 package com.mpcmaid.audio;
 
+import com.mpcmaid.MPCMaid;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -15,6 +19,8 @@ import javax.sound.sampled.SourceDataLine;
 public class AudioWorker extends Thread {
 
 	private final BlockingQueue<Sample> clipQueue;
+
+	private static final Logger logger = Logger.getLogger(AudioWorker.class.getName());
 
 	AudioWorker(BlockingQueue<Sample> queue) {
 		this.clipQueue = queue;
@@ -67,7 +73,7 @@ public class AudioWorker extends Thread {
 				dataLine.write(sample.getBytes(), 0, sample.getBytes().length);
 				//dataLine.close();
 			} catch (LineUnavailableException | IllegalArgumentException e) {
-				e.printStackTrace();
+				logger.log(Level.SEVERE, e, e::getMessage);
 			}
 		}
 	}
