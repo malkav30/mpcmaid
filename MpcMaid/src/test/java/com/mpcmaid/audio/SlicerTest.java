@@ -1,6 +1,8 @@
 package com.mpcmaid.audio;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.System.Logger.Level;
 import java.lang.System.Logger;
 
@@ -22,7 +24,10 @@ public class SlicerTest extends TestCase {
 	private static final int MIDI_PPQ = 96;
 
 	protected void setUp() throws Exception {
-		final Sample sample = Sample.open(getClass().getResourceAsStream("myLoop.WAV"));
+		InputStream is = getClass().getResourceAsStream("myLoop.WAV");
+		InputStream bis = new BufferedInputStream(is);
+		final Sample sample = Sample.open(bis);
+
 		slicer = new Slicer(sample, WINDOW_SIZE, OVERLAP_RATIO, AVERAGE_ENERGY_WINDOW);
 		slicer.extractMarkers();
 		markers = slicer.getMarkers();

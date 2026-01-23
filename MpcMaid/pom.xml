@@ -4,10 +4,21 @@
     <groupId>com.mpcmaid</groupId>
     <artifactId>mpcmaid</artifactId>
     <version>1.0-RC1</version>
+    <!-- seems to be required when using maven jlink plugin, instead of the default jar packaging -->
+     <packaging>jlink</packaging>
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Ensure consistency of resources processing across platforms -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- source and target version of java to use for the compiler -->
+		<!-- <maven.compiler.release>21</maven.compiler.release> -->
+		<!-- this is the name of our module, tu be used by JavaFX -->
+		<appModule>com.mpcmaid</appModule>
+		<!-- our main class, or entrypoint -->
+		<appMainClass>com.mpcmaid.MPCMaid</appMainClass>
+		<!-- Jpackage version -->
+		<jpackage.version>1.6.6</jpackage.version>
     </properties>
     <distributionManagement>
         <repository>
@@ -48,6 +59,45 @@
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     </configuration>
                 </plugin>
+
+
+
+<!-- I don't see how to pass modules from module-info.java in the help doc. bummer! -->
+                <!-- <plugin>
+                    <groupId>com.github.akman</groupId>
+                    <artifactId>jlink-maven-plugin</artifactId>
+                    <version>0.1.11</version>
+                    <configuration>
+                    <modulepath>
+                        <dependencysets>
+                        <dependencyset>
+                            <includeoutput>true</includeoutput>
+                            <excludeautomatic>true</excludeautomatic>
+                        </dependencyset>
+                        </dependencysets>
+                    </modulepath>
+                    <noheaderfiles>true</noheaderfiles>
+                    <nomanpages>true</nomanpages>
+                          <addmodules>
+       <addmodule>java.base</addmodule>
+       <addmodule>java.desktop</addmodule>
+					<addmodule>${appModule}</addmodule>
+      </addmodules>
+                    <compress>
+                        <compression>ZIP</compression>
+                    </compress>
+                    <stripdebug>true</stripdebug>
+                    </configuration>
+                </plugin> -->
+
+
+
+
+
+
+
+
+
             </plugins>
         </pluginManagement>
         <plugins>
@@ -65,8 +115,28 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.1</version>
             </plugin>
-             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
+            <!-- <plugin> -->
+                <!-- dependencies is needed alongside jar plugin when not using jlink, to generate the mods we need for jpackage -->
+                <!-- given the warnings I get, I suspect this is already the case -->
+                <!-- <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <outputDirectory>target/${project.artifactId}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin> -->
+             <!-- <plugin> -->
+                <!-- I suspect assembly would be enough to generate what we need for jpackage, but not sure about that, I need to try wit e.g. logback -->
+                <!-- <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                 <execution>
                     <phase>package</phase>
@@ -86,7 +156,98 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>
+            </plugin> -->
+
+          <!-- <plugin>
+            <groupId>com.github.akman</groupId>
+            <artifactId>jlink-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>jlink</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin> -->
+
+<!-- test with maven jlink, as akman jlink duplicates the module-info.java information in the pom, which is both inefficient and dangerous -->
+<!-- this part is useless if you don't use a specific classifier for jlink (let's see if jpackage figures out automatically where jlink put the stuff) -->
+        <!-- <plugin>
+            <artifactId>maven-jlink-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>jlink</goal>
+                </goals>
+              </execution>
+            </executions>
+        </plugin> -->
+<plugin>
+        <artifactId>maven-jlink-plugin</artifactId>
+        <version>3.2.0</version>
+        <extensions>true</extensions>
+        <configuration>    
+                    <compress>
+                       2
+                    </compress>
+                    <launcher>
+                    ${application}=${appModule}/${appMainClass}
+                    </launcher>
+                    <verbose>true</verbose>
+        </configuration>
+      </plugin>
+            			<!-- Jpackage plugin (there are two available, this one works on first try, so...) -->
+			<plugin>
+			  <groupId>org.panteleyev</groupId>
+				<artifactId>jpackage-maven-plugin</artifactId>
+				<version>1.6.6</version>
+				<configuration>
+					<!-- classical reuse of the maven coordinates to name our application -->
+					<name>${project.artifactId}</name>
+					<appVersion>${project.version}</appVersion>
+					<vendor>${project.groupId}</vendor>
+					<!-- this is the folder where our installer will be generated -->
+					<destination>target/dist</destination>
+					<!-- same as for JavaFX plugin, our entrypoint -->
+					<module>${appModule}/${appMainClass}</module>
+					<!-- where the jlink image was generated -->
+					<!-- here we use the jlink image as an input for jpackage, -->
+					<!-- but jpackage can work with other base artifacts, see doc. -->
+					<!-- <runtimeImage>target/${project.artifactId}</runtimeImage> -->
+                    <!-- at the moment full jre, I4m trying to trim that down with jlink plugin -->
+                    <!-- <runtimeImage>${java.home}</runtimeImage> -->
+					<javaOptions>
+						<!-- same as for the mqven process, tell jqvq that our files are UTF-8 encoded -->
+						<option>-Dfile.encoding=UTF-8</option>
+					</javaOptions>
+                    <!-- where you put your jars (see jar plugin) if you don't use jlink maven (valid for both akman and jar methods)  -->
+                    <!-- <modulePaths>
+                        <modulePath>target/mods</modulePath>
+                    </modulePaths> -->
+                    <!-- the jlink image generated by maven jlink plugin -->
+                    <runtimeImage>target/maven-jlink/default</runtimeImage>
+				</configuration>
+				<executions>
+					<execution>
+						<!-- Again, we tie the jpackage:jpackage goal to the package phase of maven -->
+						<!-- then, launching mvn package will execute jlink ad jpackage in order -->
+						<phase>package</phase>
+						<goals>
+							<goal>jpackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+            <!-- <plugin> -->
+                <!-- jar plugin copies our jar into some dir, alongside dependencies (see dependencies plugin and jpackage plugin doc) -->
+                <!-- <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>target/mods</outputDirectory>
+                </configuration>
+            </plugin> -->
         </plugins>
     </build>
     <reporting>
@@ -177,6 +338,84 @@
                         <groupId>org.eluder.coveralls</groupId>
                         <artifactId>coveralls-maven-plugin</artifactId>
                         <version>4.3.0</version>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        		<!-- Profiles in maven help you define behaviors that are only triggered under specific circumstances -->
+		<!-- here they are used to only generate the right package according to the OS we are on -->
+		<!-- this is needed because running jpackage:jpackage during the package pahse does not infer the profile automatically -->
+		<!-- while running jpackage:jpackage from the commandline does -->
+        <profile>
+            <id>win</id>
+            <activation>
+			<!-- here we specify that the win profile should only run when we are on windows -->
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>${jpackage.version}</version>
+                        <configuration>
+						<!-- here we can specify a dedicated part of the configuration that will only be activated for windows builds -->
+							<!-- <icon>${project.basedir}/java.ico</icon> -->
+							<winMenu>true</winMenu>
+							<winMenuGroup>${project.artifactId}</winMenuGroup>
+							<winPerUserInstall>true</winPerUserInstall>
+							<winShortcut>true</winShortcut>
+							<type>exe</type>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>${jpackage.version}</version>
+                        <configuration>
+						<!-- dedicated macos options -->
+                            <!-- <icon>${project.basedir}/icons.icns</icon> -->
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>${jpackage.version}</version>
+                        <configuration>
+						<!-- dedicated linux options -->
+							<linuxShortcut>true</linuxShortcut>
+							<linuxPackageName>${project.artifactId}</linuxPackageName>
+							<linuxAppCategory>Utilities</linuxAppCategory>
+							<linuxMenuGroup>Utilities</linuxMenuGroup>
+							<!-- <icon>${project.basedir}/java.bmp</icon> -->
+                            <!-- <type>APP_IMAGE</type> -->
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
