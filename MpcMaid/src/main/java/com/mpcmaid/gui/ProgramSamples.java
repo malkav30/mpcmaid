@@ -66,13 +66,13 @@ public class ProgramSamples extends SampleMatrix {
 		if (sampleName.trim().isEmpty()) {
 			remove(layer);
 			return;
-		}
-		if (path == null) {
+		} else if (path == null) {
 			return;
-		}
-		final Sample sample = Sample.findFile(sampleName, path);
-		if (sample.isValid()) {
-			set(layer, sample);
+		} else {
+			final Sample sample = Sample.findFile(sampleName, path); // cette méthode peut retourner null si sampleName est null, sauf qu'il est déréférencé par le premier test, donc s'il est nul on a déjà eu une NPE
+			if (sample.isValid()) { //FIXME erreur de control flow, si la méthode du dessus est simplifiée cette ligne crie à cause d'une NPE, mais on ne peut pas avoir de NPE
+				set(layer, sample);
+			}
 		}
 	}
 

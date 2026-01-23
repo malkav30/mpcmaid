@@ -1,7 +1,5 @@
 package com.mpcmaid.audio;
 
-import com.mpcmaid.MPCMaid;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -30,6 +28,8 @@ public class AudioWorker extends Thread {
 	 * Plays the queued clips, closing the
 	 * data line if no new AudioClips are fetched within a certain (short)
 	 * period of time.
+	 * FIXME: this may be enhanced further using true multithreading, because as for now the sample playback is barely
+	 * usable, being very slow to trigger
 	 */
 	public void run() {
 		SourceDataLine dataLine = null;
@@ -39,20 +39,16 @@ public class AudioWorker extends Thread {
 				try {
 					sample = clipQueue.poll(5, TimeUnit.SECONDS);
 					if (sample == null) {
-						if (dataLine != null && dataLine.isOpen() && !dataLine.isRunning()) {
-							dataLine.close();
-							dataLine = null;
-						}
+						closeUnusedDataline(dataLine);
 						continue;
 					}
 				} catch (InterruptedException e) {
-					if (dataLine != null && dataLine.isOpen() && !dataLine.isRunning()) {
-						dataLine.close();
-						dataLine = null;
-					}
+					closeUnusedDataline(dataLine);
 					continue;
 				}
+
 				AudioFormat format = sample.getFormat();
+
 				if (dataLine == null) {
 					DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
 					dataLine = (SourceDataLine) AudioSystem.getLine(info);
@@ -75,6 +71,12 @@ public class AudioWorker extends Thread {
 			} catch (LineUnavailableException | IllegalArgumentException e) {
 				logger.log(Level.SEVERE, e, e::getMessage);
 			}
+		}
+	}
+
+	private void closeUnusedDataline(SourceDataLine dataLine) {
+		if (dataLine != null && dataLine.isOpen() && !dataLine.isRunning()) {
+			dataLine.close(); // FIXME we never go there, dataline is always running
 		}
 	}
 }

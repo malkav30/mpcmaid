@@ -1,7 +1,5 @@
 package com.mpcmaid.audio;
 
-import com.mpcmaid.MPCMaid;
-
 import java.io.File;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;

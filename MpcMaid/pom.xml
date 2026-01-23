@@ -13,7 +13,7 @@
         <repository>
         <id>github</id>
         <name>GitHub Packages</name>
-        <url>https://maven.pkg.github.com/malkav30/mpcmai</url>
+        <url>https://maven.pkg.github.com/malkav30/mpcmaid</url>
         </repository>
     </distributionManagement>
     <dependencies>

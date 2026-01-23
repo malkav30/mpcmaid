@@ -31,7 +31,9 @@ public class FileDragHandler extends TransferHandler {
 			final List<File> files = (List<File>) data.getTransferData(DataFlavor.javaFileListFlavor);
 			process(files);
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, e, e::getMessage);
+			logger.log(Level.SEVERE, e, e::getMessage); //FIXME ~~either rethrow a runtime~~, but it seems we are at the top leve, or put in place a sensible error.
+			// FIXME the problem is we expect pgm files in some cases, and we get unhandled errors in special cases
+			throw new RuntimeException(e); // FIXME useless it seems
 		}
 
 		return true;

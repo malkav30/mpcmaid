@@ -46,11 +46,9 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 		this.element = element;
 		this.parameter = parameter;
 
-		setupLabel(parameter);
-
-		setupValue();
-
-		setupToolTip(parameter);
+		this.setupLabel(parameter);
+		this.setupValue();
+		this.setupToolTip(parameter);
 	}
 
 	public void load() {

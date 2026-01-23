@@ -47,12 +47,11 @@ public final class MPCMaid {
 	}
 
 	public static void hideSplash() {
-		if (screen == null) {
-			return;
+		if (screen != null) {
+			screen.setVisible(false);
+			screen.dispose();
+			screen = null;
 		}
-		screen.setVisible(false);
-		screen.dispose();
-		screen = null;
 	}
 
 	public static void main(String[] args) {
@@ -110,18 +109,10 @@ public final class MPCMaid {
 	public static  void makeAsNativeAsPossible() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, e, e::getMessage);
-		}
-		try {
 			if (isMacOsX()) {
 				System.setProperty("apple.laf.useScreenMenuBar", "true");
 				System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MPC Maid");
 			}
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, e, e::getMessage);
-		}
-		try {
 			Preferences.getInstance().load();
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, e, e::getMessage);
