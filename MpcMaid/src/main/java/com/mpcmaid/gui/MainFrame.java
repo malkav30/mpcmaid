@@ -178,6 +178,8 @@ public final class MainFrame extends BaseFrame {
 	}
 
 	public void saveAs() {
+		//if () {} else { //FIXME add a message if renamed samples : save pgm won't find them back...
+
 		final FileDialog saveDialog = getDialog(Preferences.getInstance().getSavePath(), FileDialog.SAVE);
 		Preferences.getInstance().setSavePath(saveDialog.getDirectory());
 		String filename = saveDialog.getFile();
@@ -190,7 +192,7 @@ public final class MainFrame extends BaseFrame {
 			final File file = new File(filePath);
 			setPgmFile(file);
 			program.save(pgmFile);
-		}
+		}//}
 	}
 
 	private FileDialog getDialog(String SavePath, int save) {

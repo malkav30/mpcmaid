@@ -71,7 +71,7 @@ public final class Sample {
 	 */
 	public static Sample findFile(String sampleName, File path) {
 		if (sampleName == null || sampleName.trim().isEmpty()) {
-			return null;
+			return null; //FIXME peut mieux faire sans null
 		}
 		File file = new File(path, sampleName + ".wav");
 		if (file.exists()) {
@@ -81,7 +81,7 @@ public final class Sample {
 		if (file.exists()) {
 			return new Sample(file, sampleName, OK);
 		}
-		return new Sample(null, sampleName, NOT_FOUND);
+		return new Sample(null, sampleName, NOT_FOUND); //FIXME peut mieux faire ? sans null
 	}
 
 	private Sample(File importedFile, String name, Status status) {

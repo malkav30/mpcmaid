@@ -48,12 +48,11 @@ public final class MPCMaid {
 	}
 
 	public static void hideSplash() {
-		if (screen == null) {
-			return;
+		if (screen != null) {
+			screen.setVisible(false);
+			screen.dispose();
+			screen = null;
 		}
-		screen.setVisible(false);
-		screen.dispose();
-		screen = null;
 	}
 
 	public static void main(String[] args) {
