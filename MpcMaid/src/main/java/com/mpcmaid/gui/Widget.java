@@ -106,7 +106,7 @@ public abstract class Widget<T extends JComponent> extends JPanel implements Act
 	}
 
 	public boolean notValidate(Object o) {
-		return getType().validate(o);
+		return !getType().validate(o);
 	}
 
 	protected void check(final Object o) {
