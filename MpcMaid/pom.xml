@@ -3,22 +3,19 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mpcmaid</groupId>
     <artifactId>mpcmaid</artifactId>
-    <version>1.0-RC1</version>
+    <version>1.0.0</version>
     <!-- seems to be required when using maven jlink plugin, instead of the default jar packaging -->
      <packaging>jlink</packaging>
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Ensure consistency of resources processing across platforms -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- source and target version of java to use for the compiler -->
-		<!-- <maven.compiler.release>21</maven.compiler.release> -->
-		<!-- this is the name of our module, tu be used by JavaFX -->
+		<!-- this is the name of our module, to be used by JavaFX -->
 		<appModule>com.mpcmaid</appModule>
 		<!-- our main class, or entrypoint -->
 		<appMainClass>com.mpcmaid.MPCMaid</appMainClass>
 		<!-- Jpackage version -->
-		<jpackage.version>1.6.6</jpackage.version>
+		<jpackage.version>1.7.3</jpackage.version>
     </properties>
     <distributionManagement>
         <repository>
@@ -38,6 +35,11 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.1.2</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -189,16 +191,21 @@
         <version>3.2.0</version>
         <extensions>true</extensions>
         <configuration>    
-                    <compress>
-                       2
-                    </compress>
-                    <launcher>
-                    ${application}=${appModule}/${appMainClass}
-                    </launcher>
                     <verbose>true</verbose>
+                    <!-- this sets the name of the launcher script in our jlink image -->
+                    <launcher>${project.artifactId}=${appModule}/${appMainClass}</launcher>
+                    <!-- get rid of the debug information in your classes -->
+                    <!-- doing this will complicate debugging, as you won't have the line numbers in the stacktraces anymore -->
+                    <stripDebug>true</stripDebug>
+                    <!-- don't generate man pages, our app doesn't need that -->
+                    <noManPages>true</noManPages>
+                    <!-- amount of compression for the zip file. this is equivalent to zip-6 -->
+                    <compress>zip-6</compress>
+                    <!-- don't include header files of native libraries, our app doesn't need that either -->
+                    <noHeaderFiles>true</noHeaderFiles>
         </configuration>
       </plugin>
-            			<!-- Jpackage plugin (there are two available, this one works on first try, so...) -->
+            <!-- Jpackage plugin -->
 			<plugin>
 			  <groupId>org.panteleyev</groupId>
 				<artifactId>jpackage-maven-plugin</artifactId>
@@ -219,7 +226,7 @@
                     <!-- at the moment full jre, I4m trying to trim that down with jlink plugin -->
                     <!-- <runtimeImage>${java.home}</runtimeImage> -->
 					<javaOptions>
-						<!-- same as for the mqven process, tell jqvq that our files are UTF-8 encoded -->
+						<!-- same as for the maven process, tell java that our files are UTF-8 encoded -->
 						<option>-Dfile.encoding=UTF-8</option>
 					</javaOptions>
                     <!-- where you put your jars (see jar plugin) if you don't use jlink maven (valid for both akman and jar methods)  -->
@@ -367,7 +374,7 @@
 							<winMenuGroup>${project.artifactId}</winMenuGroup>
 							<winPerUserInstall>true</winPerUserInstall>
 							<winShortcut>true</winShortcut>
-							<type>exe</type>
+							<!-- <type>MSI</type> -->
                         </configuration>
                     </plugin>
                 </plugins>
